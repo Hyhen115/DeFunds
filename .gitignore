@@ -31,3 +31,6 @@ Thumbs.db
 *.log.*
 temp/
 tmp/
+
+artifacts/
+cache/
