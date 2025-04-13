@@ -16,6 +16,8 @@ A decentralized crowdfunding platform with voting mechanism built with **React**
 
 
 ## Requirements
-
+1. vite (for build)
+2. web3.js (for contract interactions)
+3. tailwindcss
 
 ## Setup
