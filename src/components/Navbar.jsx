@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { AppBar, Toolbar, Typography, Button, Box, Collapse } from "@mui/material";
 import { connectWallet } from "../utils/wallet";
 import makeBlockie from "ethereum-blockies-base64";
@@ -27,6 +27,7 @@ const Navbar = ({ account, setAccount, setWeb3 }) => {
     setWeb3(null);
     setDropdownOpen(false);
     console.log("Logged out");
+    navigate("/"); // Redirect to home page after logout
   };
 
   const handleRestrictedClick = (path) => {
@@ -57,8 +58,14 @@ const Navbar = ({ account, setAccount, setWeb3 }) => {
       <Toolbar sx={{ minHeight: 64 }}>
         <Typography
           variant="h6"
-          component="div"
-          sx={{ color: "#000000", flexGrow: 0, mr: 2 }}
+          component={Link}
+          to="/"
+          sx={{
+            color: "#000000",
+            flexGrow: 0,
+            mr: 2,
+            textDecoration: "none",
+          }}
         >
           Crowdfunding dApp
         </Typography>
@@ -77,10 +84,20 @@ const Navbar = ({ account, setAccount, setWeb3 }) => {
           <Button
             onClick={() => handleRestrictedClick("/create")}
             sx={{
-              color: account ? "#000000" : "#A0A0A0",
               mx: 1,
               textTransform: "none",
-              pointerEvents: account ? "auto" : "none",
+              ...(account
+                ? {
+                    variant: "outlined",
+                    color: "#000000",
+                    borderColor: "#000000",
+                    border: "1px solid #000000",
+                  }
+                : {
+                    color: "#A0A0A0",
+                    pointerEvents: "none",
+                    border: "none",
+                  }),
             }}
           >
             Start a Campaign

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
+import Home from "./pages/Home";
 import MyCampaigns from "./pages/MyCampaigns";
 import CreateCampaign from "./pages/CreateCampaign";
 
@@ -12,9 +13,9 @@ const App = () => {
     <Router>
       <Navbar account={account} setAccount={setAccount} setWeb3={setWeb3} />
       <Routes>
-        <Route path="/" element={<div style={{ padding: "20px" }}><h2>Home</h2></div>} />
-        <Route path="/campaigns" element={<MyCampaigns />} />
-        <Route path="/create" element={<CreateCampaign />} />
+        <Route path="/" element={<Home account={account} />} />
+        <Route path="/campaigns" element={<MyCampaigns account={account} />} />
+        <Route path="/create" element={<CreateCampaign account={account} />} />
       </Routes>
     </Router>
   );
