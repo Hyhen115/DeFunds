@@ -126,8 +126,8 @@ const Navbar = ({ account, setAccount, setWeb3 }) => {
                   <Button
                     variant="outlined"
                     sx={{
-                      color: "#000000",
-                      borderColor: "#000000",
+                      color: "#CF142B",
+                      borderColor: "#CF142B",
                       textTransform: "none",
                       width: "100%",
                     }}
@@ -142,8 +142,8 @@ const Navbar = ({ account, setAccount, setWeb3 }) => {
             <Button
               variant="outlined"
               sx={{
-                color: "#000000",
-                borderColor: "#000000",
+                color: "#4F90FF",
+                borderColor: "#4F90FF",
                 mx: 1,
                 textTransform: "none",
               }}
