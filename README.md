@@ -1,6 +1,6 @@
 # Crowdfunding-Dapp
 
-A decentralized crowdfunding platform with voting mechanism built with **React** and **Ethereum**. Users can create and fund campaigns using Ether, with campaign images uploaded via **Cloudinary**. Smart contracts (`Crowdfund` and `CrowdfundFactory`) manage campaign logic, ensuring transparency and security.
+A decentralized crowdfunding platform with voting mechanism built with **React**, **Vite**, **web3.js**, **TailwinfCSS**, **Material-UI**, **Boostrap** and **Ethereum**. Users can create and fund campaigns using Ether, with campaign images uploaded via **Cloudinary**. Smart contracts (`Crowdfund` and `CrowdfundFactory`) manage campaign logic, ensuring transparency and security.
 
 ## Table of Contents
 - [Overview](#overview)
@@ -15,9 +15,7 @@ A decentralized crowdfunding platform with voting mechanism built with **React**
 ## Features
 
 
-## Requirements
-1. vite (for build)
-2. web3.js (for contract interactions)
-3. tailwindcss
+## Getting Started
+
 
 ## Setup
