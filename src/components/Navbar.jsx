@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { AppBar, Toolbar, Typography, Button, Box } from "@mui/material";
+import { Link, useNavigate } from "react-router-dom";
+import { AppBar, Toolbar, Typography, Button, Box, Collapse } from "@mui/material";
 import { connectWallet } from "../utils/wallet";
 import makeBlockie from "ethereum-blockies-base64";
 
 const Navbar = ({ account, setAccount, setWeb3 }) => {
   const [isMounted, setIsMounted] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const navigate = useNavigate();
 
   const handleConnect = async () => {
     try {
@@ -18,6 +20,21 @@ const Navbar = ({ account, setAccount, setWeb3 }) => {
       console.error("Wallet connection error:", error);
       alert(error.message);
     }
+  };
+
+  const handleLogout = () => {
+    setAccount(null);
+    setWeb3(null);
+    setDropdownOpen(false);
+    console.log("Logged out");
+  };
+
+  const handleRestrictedClick = (path) => {
+    if (!account) {
+      alert("Please connect your wallet to access this feature.");
+      return;
+    }
+    navigate(path);
   };
 
   useEffect(() => {
@@ -46,42 +63,80 @@ const Navbar = ({ account, setAccount, setWeb3 }) => {
           Crowdfunding dApp
         </Typography>
         <Button
-          component={Link}
-          to="/campaigns"
-          sx={{ color: "#000000", mx: 1, textTransform: "none" }}
+          onClick={() => handleRestrictedClick("/campaigns")}
+          sx={{
+            color: account ? "#000000" : "#A0A0A0",
+            mx: 1,
+            textTransform: "none",
+            pointerEvents: account ? "auto" : "none",
+          }}
         >
           My Campaigns
         </Button>
-        <Box sx={{ display: "flex", ml: "auto" }}>
+        <Box sx={{ display: "flex", alignItems: "center", ml: "auto" }}>
           <Button
-            component={Link}
-            to="/create"
-            sx={{ color: "#000000", mx: 1, textTransform: "none" }}
+            onClick={() => handleRestrictedClick("/create")}
+            sx={{
+              color: account ? "#000000" : "#A0A0A0",
+              mx: 1,
+              textTransform: "none",
+              pointerEvents: account ? "auto" : "none",
+            }}
           >
             Start a Campaign
           </Button>
           {account && isMounted ? (
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                mx: 1,
-                pointerEvents: "none",
-              }}
-            >
-              <img
-                src={makeBlockie(account)}
-                alt="Account Icon"
-                style={{
-                  height: "24px",
-                  width: "24px",
-                  marginRight: "4px",
-                  borderRadius: "50%",
+            <Box sx={{ position: "relative", mx: 1 }}>
+              <Box
+                sx={{
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
                 }}
-              />
-              <Typography sx={{ color: "#000000" }}>
-                {account ? `${account.slice(0, 6)}...${account.slice(-4)}` : "Loading..."}
-              </Typography>
+                onClick={() => setDropdownOpen(!dropdownOpen)}
+              >
+                <img
+                  src={makeBlockie(account)}
+                  alt="Account Icon"
+                  style={{
+                    height: "24px",
+                    width: "24px",
+                    borderRadius: "50%",
+                  }}
+                />
+              </Box>
+              <Collapse in={dropdownOpen}>
+                <Box
+                  sx={{
+                    position: "absolute",
+                    top: "100%",
+                    right: 0,
+                    backgroundColor: "#FFFFFF",
+                    border: "1px solid #E0E0E0",
+                    borderRadius: "4px",
+                    boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                    zIndex: 1,
+                    p: 1,
+                    minWidth: "200px",
+                  }}
+                >
+                  <Typography sx={{ color: "#000000", mb: 1 }}>
+                    {`${account.slice(0, 6)}...${account.slice(-4)}`}
+                  </Typography>
+                  <Button
+                    variant="outlined"
+                    sx={{
+                      color: "#000000",
+                      borderColor: "#000000",
+                      textTransform: "none",
+                      width: "100%",
+                    }}
+                    onClick={handleLogout}
+                  >
+                    Logout
+                  </Button>
+                </Box>
+              </Collapse>
             </Box>
           ) : (
             <Button
