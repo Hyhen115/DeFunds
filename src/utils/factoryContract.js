@@ -60,7 +60,7 @@ const factoryABI = [
 			},
 			{
 				"internalType": "uint256",
-				"name": "_duration",
+				"name": "_deadline",
 				"type": "uint256"
 			},
 			{
@@ -225,7 +225,7 @@ const factoryABI = [
 ];
 
 // Replace with your deployed CrowdfundFactory address
-const factoryAddress = "0xC1C8f5EECBBc9c83691668Eb6CDff327E51c8dED";
+const factoryAddress = "0x5e6F297E3d775bEd215f913c9919Dd276B127B7b";
 
 export const initializeFactoryContract = (web3) => {
   if (!web3) {

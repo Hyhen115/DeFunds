@@ -4,7 +4,7 @@ import makeBlockie from "ethereum-blockies-base64"; // Import the blockie genera
 
 const CampaignCard = ({ title, imageUrl, ownerAddress, deadline, raised, goal }) => {
   // Default image if no imageUrl is provided
-  const defaultImage = "https://via.placeholder.com/150?text=No+Image";
+  const defaultImage = "../assets/defualt.jpg";
   const displayImage = imageUrl || defaultImage;
 
   // Truncate the owner address for readability (e.g., 0x123456...abcd)
@@ -29,7 +29,7 @@ const CampaignCard = ({ title, imageUrl, ownerAddress, deadline, raised, goal })
     <Card
       sx={{
         boxShadow: "0 2px 10px rgba(0,0,0,0.2)",
-        borderRadius: "8px",
+        borderRadius: "5px",
         "&:hover": {
           transform: "translateY(-4px)",
           transition: "transform 0.3s ease",

@@ -26,7 +26,7 @@ const crowdfundABI = [
 			},
 			{
 				"internalType": "uint256",
-				"name": "_duration",
+				"name": "_deadline",
 				"type": "uint256"
 			},
 			{
