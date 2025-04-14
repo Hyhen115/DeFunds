@@ -42,13 +42,13 @@ contract Crowdfund{
     }
 
     // constructor
-    constructor(address _owner, string memory _name, string memory _description, uint256 _target, uint256 _duration, string memory _image
+    constructor(address _owner, string memory _name, string memory _description, uint256 _target, uint256 _deadline, string memory _image
     ) {
         owner = _owner;
         campaignName = _name;
         description = _description;
         target = _target;
-        deadline = block.timestamp + (_duration * 1 days); // add duration to cur time
+        deadline = _deadline;
         state = CampaignState.Active; // set active as defualt
         image = _image;
     }

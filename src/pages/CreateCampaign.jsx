@@ -8,8 +8,26 @@ import {
   Step,
   StepLabel,
   Link,
+  CircularProgress,
 } from "@mui/material";
-import formBackground from "../assets/homeBackground.png"; // Ensure this file exists
+import formBackground from "../assets/homeBackground.png";
+
+// Gradient Circular Progress component
+function GradientCircularProgress() {
+  return (
+    <React.Fragment>
+      <svg width={0} height={0}>
+        <defs>
+          <linearGradient id="my_gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#e01cd5" />
+            <stop offset="100%" stopColor="#1CB5E0" />
+          </linearGradient>
+        </defs>
+      </svg>
+      <CircularProgress sx={{ "svg circle": { stroke: "url(#my_gradient)" } }} />
+    </React.Fragment>
+  );
+}
 
 const steps = [
   "Campaign Details",
@@ -26,10 +44,10 @@ const CreateCampaign = ({ web3, account, factoryContract }) => {
     deadline: "",
     imageURL: "",
   });
-  const [newCampaignAddress, setNewCampaignAddress] = useState(""); // Store the new campaign address
-  const [error, setError] = useState(""); // Store any errors
+  const [newCampaignAddress, setNewCampaignAddress] = useState("");
+  const [error, setError] = useState("");
+  const [isDeploying, setIsDeploying] = useState(false);
 
-  // Update form data state when an input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -38,48 +56,39 @@ const CreateCampaign = ({ web3, account, factoryContract }) => {
     }));
   };
 
-  // Handle form submission and advance the stepper
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Reset error state
     setError("");
 
     if (activeStep === 0) {
-      // Step 1: Validate and deploy the campaign
+      // Step 1: Validate and initiate campaign deployment
       try {
         if (!web3 || !account || !factoryContract) {
           throw new Error("Web3, account, or factory contract not available");
         }
 
-        // Convert funding goal from ETH to Wei
         const fundingGoalInWei = web3.utils.toWei(formData.fundingGoal, "ether");
-
-        // Convert deadline (date string) to a Unix timestamp in seconds
         const deadlineDate = new Date(formData.deadline);
-        const deadlineTimestamp = Math.floor(deadlineDate.getTime() / 1000); // Deadline in seconds
-
-        // Validate that the deadline is in the future
-        const currentTime = Math.floor(Date.now() / 1000); // Current time in seconds
+        const deadlineTimestamp = Math.floor(deadlineDate.getTime() / 1000);
+        const currentTime = Math.floor(Date.now() / 1000);
         if (deadlineTimestamp <= currentTime) {
           throw new Error("Deadline must be in the future");
         }
 
-        // Prepare the parameters for createCampaign
-        const { title, description, imageURL } = formData;
+        setIsDeploying(true);
+        setActiveStep(1); // Move to "Deploying Campaign"
 
-        // Call createCampaign on the factory contract
+        const { title, description, imageURL } = formData;
         const tx = await factoryContract.methods
           .createCampaign(
             title,
             description,
             fundingGoalInWei,
-            deadlineTimestamp, // Pass the timestamp directly
-            imageURL || "" // Use empty string if no image URL
+            deadlineTimestamp,
+            imageURL || ""
           )
           .send({ from: account });
 
-        // Listen for the CampaignCreated event to get the new campaign address
         const event = tx.events.CampaignCreated;
         if (!event) {
           throw new Error("CampaignCreated event not found in transaction receipt");
@@ -87,16 +96,16 @@ const CreateCampaign = ({ web3, account, factoryContract }) => {
         const campaignAddress = event.returnValues.campaignAddress;
         setNewCampaignAddress(campaignAddress);
 
-        // Advance to the next step (Deploying Campaign)
-        setActiveStep(activeStep + 1);
+        // Move to "Campaign Launched"
+        setActiveStep(2);
+        setIsDeploying(false);
       } catch (err) {
         console.error("Error creating campaign:", err);
         setError(err.message || "Failed to create campaign");
+        setActiveStep(0); // Revert to form if deployment fails
+        setIsDeploying(false);
       }
-    } else if (activeStep === 1) {
-      // Step 2: Simulate deployment (already deployed in step 1)
-      setActiveStep(activeStep + 1);
-    } else {
+    } else if (activeStep === 2) {
       // Step 3: Reset the form and stepper
       setActiveStep(0);
       setFormData({
@@ -133,7 +142,7 @@ const CreateCampaign = ({ web3, account, factoryContract }) => {
           maxWidth: "600px",
         }}
       >
-        {/* Horizontal Stepper */}
+        {/* Stepper */}
         <Stepper activeStep={activeStep} alternativeLabel sx={{ mb: 3 }}>
           {steps.map((label) => (
             <Step key={label}>
@@ -154,9 +163,12 @@ const CreateCampaign = ({ web3, account, factoryContract }) => {
         )}
 
         {activeStep === 1 && (
-          <Typography variant="h5" gutterBottom sx={{ mt: 1 }}>
-            Deploying your campaign...
-          </Typography>
+          <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", py: 4 }}>
+            <Typography variant="h5" gutterBottom sx={{ mt: 1 }}>
+              Deploying your campaign...
+            </Typography>
+            <GradientCircularProgress />
+          </Box>
         )}
 
         {activeStep === 2 && (
@@ -180,7 +192,7 @@ const CreateCampaign = ({ web3, account, factoryContract }) => {
           </>
         )}
 
-        {error && (
+        {error && activeStep === 0 && (
           <Typography variant="body2" color="error" sx={{ mb: 2 }}>
             {error}
           </Typography>
@@ -242,8 +254,6 @@ const CreateCampaign = ({ web3, account, factoryContract }) => {
               value={formData.imageURL}
               onChange={handleInputChange}
             />
-
-            {/* Next Button aligned right */}
             <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
               <Button
                 type="submit"
@@ -254,26 +264,29 @@ const CreateCampaign = ({ web3, account, factoryContract }) => {
                   borderColor: "#4F90FF",
                   textTransform: "none",
                 }}
+                disabled={isDeploying}
               >
                 Next
               </Button>
             </Box>
           </form>
         ) : (
-          <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-            <Button
-              variant="outlined"
-              sx={{
-                mt: 2,
-                color: "#4F90FF",
-                borderColor: "#4F90FF",
-                textTransform: "none",
-              }}
-              onClick={handleSubmit}
-            >
-              {activeStep === steps.length - 1 ? "Finish" : "Next"}
-            </Button>
-          </Box>
+          activeStep === 2 && (
+            <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+              <Button
+                variant="outlined"
+                sx={{
+                  mt: 2,
+                  color: "#4F90FF",
+                  borderColor: "#4F90FF",
+                  textTransform: "none",
+                }}
+                onClick={handleSubmit}
+              >
+                Finish
+              </Button>
+            </Box>
+          )
         )}
       </Box>
     </Box>

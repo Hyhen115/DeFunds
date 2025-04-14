@@ -26,11 +26,11 @@ contract CrowdfundFactory {
     }
 
     // create campaign
-    function createCampaign(string memory _name, string memory _description, uint256 _target, uint256 _duration, string memory _image) external whenNotPaused {
+    function createCampaign(string memory _name, string memory _description, uint256 _target, uint256 _deadline, string memory _image) external whenNotPaused {
         // input validation
         require(bytes(_name).length > 0, "name is empty");
         require(_target > 0, "target must > 0");
-        require(_duration > 0, "duration must > 0");
+        require(_deadline > block.timestamp, "deadline must be in the future");
 
         // create a new contract for the new campaign
         Crowdfund newCampaign = new Crowdfund(
@@ -38,7 +38,7 @@ contract CrowdfundFactory {
             _name,
             _description,
             _target,
-            _duration,
+            _deadline,
             _image
         );
 
