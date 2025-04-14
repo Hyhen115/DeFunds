@@ -1,6 +1,7 @@
 import React, { useRef } from "react";
-import { Box, Typography, Grid, Card, CardContent, Button } from "@mui/material";
-import homeBackground from "../assets/homeBackground.png"; // adjust the path if needed
+import { Box, Typography, Grid, Button } from "@mui/material";
+import CampaignCard from "../components/CampaignCard"; // Adjust the path if needed
+import homeBackground from "../assets/homeBackground.png"; // Adjust the path if needed
 
 const Home = () => {
   // Dummy array for campaigns—replace with contract data later.
@@ -52,7 +53,8 @@ const Home = () => {
             color: "#000", // black text color
           }}
         >
-          Join our community of creators and supporters. Explore exciting projects and help bring innovative ideas to life.
+          Join our community of creators and supporters. Explore exciting
+          projects and help bring innovative ideas to life.
         </Typography>
         <Button
           variant="outlined"
@@ -84,25 +86,14 @@ const Home = () => {
         <Grid container spacing={4}>
           {dummyCampaigns.map((campaign) => (
             <Grid item xs={12} sm={6} md={4} key={campaign}>
-              <Card
-                sx={{
-                  boxShadow: "0 2px 10px rgba(0,0,0,0.2)",
-                  borderRadius: "8px",
-                  "&:hover": {
-                    transform: "translateY(-4px)",
-                    transition: "transform 0.3s ease",
-                  },
-                }}
-              >
-                <CardContent>
-                  <Typography variant="h5" component="div" sx={{ mb: 1 }}>
-                    Campaign Title {campaign}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Brief description of campaign {campaign}. This space can be filled with data fetched from your contracts.
-                  </Typography>
-                </CardContent>
-              </Card>
+              <CampaignCard
+                title="Help Build a School"
+                imageUrl="https://neweralive.na/wp-content/uploads/2024/09/School-calender-jpg-scaled.jpg" // Optional
+                ownerAddress="0x1234567890abcdef1234567890abcdef12345678"
+                deadline={1698777600} // Unix timestamp (e.g., Oct 31, 2023)
+                raised={5} // e.g., 5 ETH raised
+                goal={10} // e.g., 10 ETH goal
+              />
             </Grid>
           ))}
         </Grid>
