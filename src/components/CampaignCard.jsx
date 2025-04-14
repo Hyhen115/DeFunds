@@ -1,5 +1,6 @@
 import React from "react";
 import { Card, CardContent, Typography, Box, LinearProgress } from "@mui/material";
+import makeBlockie from "ethereum-blockies-base64"; // Import the blockie generator
 
 const CampaignCard = ({ title, imageUrl, ownerAddress, deadline, raised, goal }) => {
   // Default image if no imageUrl is provided
@@ -9,13 +10,20 @@ const CampaignCard = ({ title, imageUrl, ownerAddress, deadline, raised, goal })
   // Truncate the owner address for readability (e.g., 0x123456...abcd)
   const truncatedAddress = `${ownerAddress.slice(0, 6)}...${ownerAddress.slice(-4)}`;
 
-  // Calculate remaining days from the deadline (assuming deadline is a Unix timestamp in seconds)
+  // Calculate remaining days and campaign state
   const currentTime = Math.floor(Date.now() / 1000); // Current time in seconds
   const remainingSeconds = deadline - currentTime;
   const remainingDays = remainingSeconds > 0 ? Math.ceil(remainingSeconds / (60 * 60 * 24)) : 0;
+  // Check if the campaign has ended and failed (didn't meet goal)
+  const hasEnded = remainingSeconds <= 0;
+  const hasFailed = hasEnded && raised < goal;
+  const statusText = remainingDays > 0 ? `Days Left: ${remainingDays}` : hasFailed ? "Failed" : "Ended";
 
   // Calculate the percentage of funds raised (cap at 100% if overfunded)
   const percentage = goal > 0 ? Math.min((raised / goal) * 100, 100) : 0;
+
+  // Generate blockie for the owner address
+  const blockie = makeBlockie(ownerAddress);
 
   return (
     <Card
@@ -32,11 +40,6 @@ const CampaignCard = ({ title, imageUrl, ownerAddress, deadline, raised, goal })
       }}
     >
       <CardContent sx={{ flexGrow: 1 }}>
-        {/* Campaign Title */}
-        <Typography variant="h5" component="div" sx={{ mb: 1 }}>
-          {title}
-        </Typography>
-
         {/* Campaign Image */}
         <Box
           sx={{
@@ -61,13 +64,35 @@ const CampaignCard = ({ title, imageUrl, ownerAddress, deadline, raised, goal })
 
         {/* Campaign Details */}
         <Box sx={{ mb: 2 }}>
-          <Typography variant="body2" color="text.secondary">
-            Owner: {truncatedAddress}
-          </Typography>
-          {/* Status and Percentage on the Same Row */}
-          <Box sx={{ display: "flex", justifyContent: "space-between", mt: 1 }}>
+          {/* First Row: Blockie on Left, Campaign Title and Address on Right */}
+          <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+            {/* Left: Blockie */}
+            <Box sx={{ mr: 1 }}>
+              <img
+                src={blockie}
+                alt="Owner Blockie"
+                style={{
+                  width: 30,
+                  height: 30,
+                  borderRadius: "50%", // Optional: makes the blockie circular
+                }}
+              />
+            </Box>
+            {/* Right: Campaign Title (Bold, Larger) and Address in Two Rows */}
+            <Box>
+              <Typography variant="h6" component="div" sx={{ fontWeight: "bold" }}>
+                {title}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                {truncatedAddress}
+              </Typography>
+            </Box>
+          </Box>
+
+          {/* Second Row: State and Percentage */}
+          <Box sx={{ display: "flex", justifyContent: "space-between" }}>
             <Typography variant="body2" color="text.secondary">
-              {remainingDays > 0 ? `Days Left: ${remainingDays}` : "Campaign Ended"}
+              {statusText}
             </Typography>
             <Typography variant="body2" color="text.secondary">
               {percentage.toFixed(2)}% Funded
