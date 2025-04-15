@@ -8,6 +8,31 @@ const factoryABI = [
 		"type": "constructor"
 	},
 	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "campaignAddress",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "owner",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "name",
+				"type": "string"
+			}
+		],
+		"name": "CampaignCreated",
+		"type": "event"
+	},
+	{
 		"inputs": [
 			{
 				"internalType": "uint256",
@@ -225,7 +250,7 @@ const factoryABI = [
 ];
 
 // Replace with your deployed CrowdfundFactory address
-const factoryAddress = "0x5e6F297E3d775bEd215f913c9919Dd276B127B7b";
+const factoryAddress = "0xDaaeeE098319124afB06d5D34d0d6Bc47EcCBAd6";
 
 export const initializeFactoryContract = (web3) => {
   if (!web3) {

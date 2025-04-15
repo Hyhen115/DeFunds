@@ -20,6 +20,8 @@ contract CrowdfundFactory {
     Campaign[] public campaigns; // list of campaigns that has created
     mapping(address => Campaign[]) public userCampaigns; // mappings for address of the corresponding 
 
+    event CampaignCreated(address indexed campaignAddress, address indexed owner, string name);
+
     // constructor to construct the factory
     constructor() {
         owner = msg.sender;
@@ -55,6 +57,8 @@ contract CrowdfundFactory {
         campaigns.push(campaign); // add to the campaign list
         userCampaigns[msg.sender].push(campaign); // map the campaign of this address to the current context
 
+        // emit to signal ui campaign is created
+        emit CampaignCreated(campaignAddr, msg.sender, _name);
     }
 
     modifier onlyOwner() {
