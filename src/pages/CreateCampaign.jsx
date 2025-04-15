@@ -56,15 +56,33 @@ const CreateCampaign = ({ web3, account, factoryContract }) => {
     }));
   };
 
+  const validateForm = () => {
+    if (!formData.title.trim()) return "Campaign title is required";
+    if (!formData.description.trim()) return "Description is required";
+    const fundingGoal = parseFloat(formData.fundingGoal);
+    if (isNaN(fundingGoal) || fundingGoal <= 0) return "Funding goal must be a positive number";
+    if (!formData.deadline) return "Deadline is required";
+    if (formData.imageURL && !/^https?:\/\/[^\s$.?#].[^\s]*$/.test(formData.imageURL)) {
+      return "Image URL must be a valid URL (if provided)";
+    }
+    return "";
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
     if (activeStep === 0) {
       // Step 1: Validate and initiate campaign deployment
+      const validationError = validateForm();
+      if (validationError) {
+        setError(validationError);
+        return;
+      }
+
       try {
         if (!web3 || !account || !factoryContract) {
-          throw new Error("Web3, account, or factory contract not available");
+          throw new Error("Please connect your wallet and ensure the app is initialized");
         }
 
         const fundingGoalInWei = web3.utils.toWei(formData.fundingGoal, "ether");
@@ -87,13 +105,22 @@ const CreateCampaign = ({ web3, account, factoryContract }) => {
             deadlineTimestamp,
             imageURL || ""
           )
-          .send({ from: account });
+          .send({ from: account })
+          .catch((err) => {
+            if (err.code === 4001) {
+              throw new Error("Transaction rejected by user");
+            }
+            throw err;
+          });
 
-        const event = tx.events.CampaignCreated;
-        if (!event) {
+        // Safely access the event
+        if (!tx.events || !tx.events.CampaignCreated) {
           throw new Error("CampaignCreated event not found in transaction receipt");
         }
-        const campaignAddress = event.returnValues.campaignAddress;
+        const campaignAddress = tx.events.CampaignCreated.returnValues.campaignAddress;
+        if (!web3.utils.isAddress(campaignAddress)) {
+          throw new Error("Invalid campaign address received");
+        }
         setNewCampaignAddress(campaignAddress);
 
         // Move to "Campaign Launched"
@@ -101,8 +128,18 @@ const CreateCampaign = ({ web3, account, factoryContract }) => {
         setIsDeploying(false);
       } catch (err) {
         console.error("Error creating campaign:", err);
-        setError(err.message || "Failed to create campaign");
-        setActiveStep(0); // Revert to form if deployment fails
+        let errorMessage = "Failed to create campaign";
+        if (err.message.includes("Transaction rejected")) {
+          errorMessage = "You rejected the transaction in your wallet";
+        } else if (err.message.includes("deadline must be in the future")) {
+          errorMessage = "The deadline must be a future date";
+        } else if (err.message.includes("name is empty")) {
+          errorMessage = "Campaign title cannot be empty";
+        } else if (err.message.includes("target must > 0")) {
+          errorMessage = "Funding goal must be greater than 0";
+        }
+        setError(errorMessage);
+        setActiveStep(0);
         setIsDeploying(false);
       }
     } else if (activeStep === 2) {
@@ -142,7 +179,6 @@ const CreateCampaign = ({ web3, account, factoryContract }) => {
           maxWidth: "600px",
         }}
       >
-        {/* Stepper */}
         <Stepper activeStep={activeStep} alternativeLabel sx={{ mb: 3 }}>
           {steps.map((label) => (
             <Step key={label}>
@@ -209,6 +245,8 @@ const CreateCampaign = ({ web3, account, factoryContract }) => {
               name="title"
               value={formData.title}
               onChange={handleInputChange}
+              error={!!error && error.includes("title")}
+              helperText={error && error.includes("title") ? error : ""}
             />
             <TextField
               label="Description"
@@ -221,6 +259,8 @@ const CreateCampaign = ({ web3, account, factoryContract }) => {
               name="description"
               value={formData.description}
               onChange={handleInputChange}
+              error={!!error && error.includes("Description")}
+              helperText={error && error.includes("Description") ? error : ""}
             />
             <TextField
               label="Funding Goal (in ETH)"
@@ -232,6 +272,9 @@ const CreateCampaign = ({ web3, account, factoryContract }) => {
               name="fundingGoal"
               value={formData.fundingGoal}
               onChange={handleInputChange}
+              error={!!error && error.includes("Funding goal")}
+              helperText={error && error.includes("Funding goal") ? error : ""}
+              inputProps={{ min: "0.0001", step: "0.0001" }}
             />
             <TextField
               label="Deadline"
@@ -244,6 +287,8 @@ const CreateCampaign = ({ web3, account, factoryContract }) => {
               name="deadline"
               value={formData.deadline}
               onChange={handleInputChange}
+              error={!!error && error.includes("deadline")}
+              helperText={error && error.includes("deadline") ? error : ""}
             />
             <TextField
               label="Image URL (optional)"
@@ -253,6 +298,8 @@ const CreateCampaign = ({ web3, account, factoryContract }) => {
               name="imageURL"
               value={formData.imageURL}
               onChange={handleInputChange}
+              error={!!error && error.includes("Image URL")}
+              helperText={error && error.includes("Image URL") ? error : ""}
             />
             <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
               <Button
@@ -264,7 +311,7 @@ const CreateCampaign = ({ web3, account, factoryContract }) => {
                   borderColor: "#4F90FF",
                   textTransform: "none",
                 }}
-                disabled={isDeploying}
+                disabled={isDeploying || !account}
               >
                 Next
               </Button>
@@ -272,7 +319,20 @@ const CreateCampaign = ({ web3, account, factoryContract }) => {
           </form>
         ) : (
           activeStep === 2 && (
-            <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+            <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2 }}>
+              <Button
+                variant="outlined"
+                sx={{
+                  mt: 2,
+                  color: "#4F90FF",
+                  borderColor: "#4F90FF",
+                  textTransform: "none",
+                }}
+                component={Link}
+                href={`/campaign/${newCampaignAddress}`}
+              >
+                View Campaign
+              </Button>
               <Button
                 variant="outlined"
                 sx={{
@@ -283,7 +343,7 @@ const CreateCampaign = ({ web3, account, factoryContract }) => {
                 }}
                 onClick={handleSubmit}
               >
-                Finish
+                Create Another
               </Button>
             </Box>
           )

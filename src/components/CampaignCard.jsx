@@ -3,29 +3,30 @@ import { Card, CardContent, Typography, Box, LinearProgress } from "@mui/materia
 import makeBlockie from "ethereum-blockies-base64"; // Import the blockie generator
 
 const CampaignCard = ({ title, imageUrl, ownerAddress, deadline, raised, goal }) => {
-  // Default image if no imageUrl is provided
+  // Default image handling: Use a fallback image if no imageUrl is provided
   const defaultImage = "../assets/defualt.jpg";
-  const displayImage = imageUrl || defaultImage;
+  const displayImage = imageUrl || defaultImage; // Fallback to default image for consistency
 
-  // Truncate the owner address for readability (e.g., 0x123456...abcd)
+  // Address truncation: Shorten the owner's address for better readability
   const truncatedAddress = `${ownerAddress.slice(0, 6)}...${ownerAddress.slice(-4)}`;
 
-  // Calculate remaining days and campaign state
+  // Time calculations: Determine remaining days and campaign status
   const currentTime = Math.floor(Date.now() / 1000); // Current time in seconds
   const remainingSeconds = deadline - currentTime;
   const remainingDays = remainingSeconds > 0 ? Math.ceil(remainingSeconds / (60 * 60 * 24)) : 0;
-  // Check if the campaign has ended and failed (didn't meet goal)
+  // Check if campaign has ended and whether it failed to meet the goal
   const hasEnded = remainingSeconds <= 0;
   const hasFailed = hasEnded && raised < goal;
   const statusText = remainingDays > 0 ? `Days Left: ${remainingDays}` : hasFailed ? "Failed" : "Ended";
 
-  // Calculate the percentage of funds raised (cap at 100% if overfunded)
+  // Percentage calculation: Compute funding progress, capped at 100%
   const percentage = goal > 0 ? Math.min((raised / goal) * 100, 100) : 0;
 
-  // Generate blockie for the owner address
+  // Blockie generation: Create a visual representation of the owner's address
   const blockie = makeBlockie(ownerAddress);
 
   return (
+    // Card styling: Apply hover effects and ensure full height usage
     <Card
       sx={{
         boxShadow: "0 2px 10px rgba(0,0,0,0.2)",
