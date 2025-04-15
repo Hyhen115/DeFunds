@@ -1,7 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { Box, Typography, Button, TextField, CircularProgress, FormControlLabel, Radio, RadioGroup } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Button,
+  TextField,
+  CircularProgress,
+  FormControlLabel,
+  Radio,
+  RadioGroup,
+  LinearProgress,
+} from "@mui/material";
 import { initializeCrowdfundContract } from "../utils/crowdfundContract.js";
+import homeBackground from "../assets/homeBackground.png";
 
 const CampaignDetails = ({ web3, account }) => {
   const { address } = useParams();
@@ -13,6 +24,7 @@ const CampaignDetails = ({ web3, account }) => {
   const [error, setError] = useState("");
   const [isDonating, setIsDonating] = useState(false);
   const [isVoting, setIsVoting] = useState(false);
+  const [donators, setDonators] = useState([]);
 
   useEffect(() => {
     const fetchCampaign = async () => {
@@ -32,18 +44,58 @@ const CampaignDetails = ({ web3, account }) => {
         const image = await campaignContract.methods.image().call();
         const target = await campaignContract.methods.target().call();
         const deadline = await campaignContract.methods.deadline().call();
-        const raised = await campaignContract.methods.getContractBalance().call();
+        const raised = await campaignContract.methods
+          .getContractBalance()
+          .call();
         const state = await campaignContract.methods.getState().call();
-        const hasDonated = await campaignContract.methods.hasDonated(account).call();
+        const hasDonated = await campaignContract.methods
+          .hasDonated(account)
+          .call();
 
-        // Fetch proposal details individually
-        const proposalData = await campaignContract.methods.curProposal().call();
+        // Fetch donators
+        const donatorsList = [];
+        let i = 0;
+        while (true) {
+          try {
+            const donatorAddr = await campaignContract.methods
+              .donators(i)
+              .call();
+            const amount = await campaignContract.methods
+              .donationAmounts(donatorAddr)
+              .call();
+            donatorsList.push({
+              address: donatorAddr,
+              amount: parseFloat(web3.utils.fromWei(amount, "ether")),
+            });
+            i++;
+          } catch {
+            break;
+          }
+        }
+
+        // Fetch proposal details
+        const proposalData = await campaignContract.methods
+          .curProposal()
+          .call();
         const proposedDays = proposalData.proposedDays;
         const votesFor = proposalData.votesFor;
         const votesAgainst = proposalData.votesAgainst;
         const active = proposalData.active;
         const voteEndTime = await campaignContract.methods.voteEndTime().call();
-        const hasVoted = active ? await campaignContract.methods.hasVoted(account).call() : false;
+
+        // Check hasVoted by attempting a static call to voteOnDeadlineExtension
+        let hasVoted = false;
+        if (active && hasDonated) {
+          try {
+            await campaignContract.methods
+              .voteOnDeadlineExtension(true)
+              .call({ from: account });
+          } catch (err) {
+            if (err.message.includes("already voted")) {
+              hasVoted = true;
+            }
+          }
+        }
 
         setCampaign({
           title,
@@ -56,20 +108,25 @@ const CampaignDetails = ({ web3, account }) => {
           hasDonated,
         });
 
+        setDonators(donatorsList);
+
         if (active && voteEndTime > Math.floor(Date.now() / 1000)) {
           setProposal({
             proposedDays: Number(proposedDays),
             votesFor: parseFloat(web3.utils.fromWei(votesFor, "ether")),
             votesAgainst: parseFloat(web3.utils.fromWei(votesAgainst, "ether")),
             voteEndTime: Number(voteEndTime),
+            active,
             hasVoted,
           });
+        } else {
+          setProposal(null);
         }
 
         setLoading(false);
       } catch (err) {
         console.error("Error fetching campaign:", err);
-        setError("Failed to load campaign details");
+        setError("Failed to load campaign details. Please try again.");
         setLoading(false);
       }
     };
@@ -83,19 +140,37 @@ const CampaignDetails = ({ web3, account }) => {
       setIsDonating(true);
       const campaignContract = initializeCrowdfundContract(web3, address);
       const amountInWei = web3.utils.toWei(donationAmount, "ether");
-      await campaignContract.methods.donate().send({ from: account, value: amountInWei });
+      await campaignContract.methods
+        .donate()
+        .send({ from: account, value: amountInWei });
       const raised = await campaignContract.methods.getContractBalance().call();
       const state = await campaignContract.methods.getState().call();
+      const amount = parseFloat(web3.utils.fromWei(amountInWei, "ether"));
       setCampaign((prev) => ({
         ...prev,
         raised: parseFloat(web3.utils.fromWei(raised, "ether")),
         state: ["Active", "Success", "Fail"][state],
         hasDonated: true,
       }));
+      setDonators((prev) => {
+        const existing = prev.find((d) => d.address === account);
+        if (existing) {
+          return prev.map((d) =>
+            d.address === account ? { ...d, amount: d.amount + amount } : d
+          );
+        }
+        return [...prev, { address: account, amount }];
+      });
       setDonationAmount("");
     } catch (err) {
       console.error("Donation error:", err);
-      setError(err.message.includes("Campaign not open") ? "Campaign is not active" : "Failed to donate");
+      setError(
+        err.message.includes("Campaign not open")
+          ? "Campaign is not active"
+          : err.message.includes("voting period now")
+          ? "Cannot donate during voting period"
+          : "Failed to donate"
+      );
     } finally {
       setIsDonating(false);
     }
@@ -107,7 +182,9 @@ const CampaignDetails = ({ web3, account }) => {
       setIsVoting(true);
       const campaignContract = initializeCrowdfundContract(web3, address);
       const voteFor = voteChoice === "for";
-      await campaignContract.methods.voteOnDeadlineExtension(voteFor).send({ from: account });
+      await campaignContract.methods
+        .voteOnDeadlineExtension(voteFor)
+        .send({ from: account });
       const proposalData = await campaignContract.methods.curProposal().call();
       setProposal((prev) => ({
         ...prev,
@@ -119,11 +196,15 @@ const CampaignDetails = ({ web3, account }) => {
     } catch (err) {
       console.error("Voting error:", err);
       setError(
-        err.message.includes("no proposal") ? "No active proposal" :
-        err.message.includes("vote period ended") ? "Voting period has ended" :
-        err.message.includes("non donator") ? "Only donators can vote" :
-        err.message.includes("already voted") ? "You have already voted" :
-        "Failed to vote"
+        err.message.includes("no proposal")
+          ? "No active proposal"
+          : err.message.includes("vote period ended")
+          ? "Voting period has ended"
+          : err.message.includes("non donator")
+          ? "Only donators can vote"
+          : err.message.includes("already voted")
+          ? "You have already voted"
+          : "Failed to vote"
       );
     } finally {
       setIsVoting(false);
@@ -132,57 +213,323 @@ const CampaignDetails = ({ web3, account }) => {
 
   if (loading) {
     return (
-      <Box sx={{ p: 4, textAlign: "center" }}>
+      <Box
+        sx={{
+          minHeight: "100vh",
+          backgroundImage: `url(${homeBackground})`,
+          backgroundRepeat: "no-repeat",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
         <CircularProgress />
-        <Typography variant="h6" sx={{ mt: 2 }}>Loading campaign...</Typography>
+        <Typography variant="h6" sx={{ mt: 2, color: "#000" }}>
+          Loading campaign...
+        </Typography>
       </Box>
     );
   }
 
   if (error || !campaign) {
     return (
-      <Box sx={{ p: 4, textAlign: "center" }}>
-        <Typography variant="h6" color="error">{error || "Campaign not found"}</Typography>
+      <Box
+        sx={{
+          minHeight: "100vh",
+          backgroundImage: `url(${homeBackground})`,
+          backgroundRepeat: "no-repeat",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Typography variant="h6" color="error">
+          {error || "Campaign not found"}
+        </Typography>
       </Box>
     );
   }
 
+  const progress = campaign.target > 0 ? (campaign.raised / campaign.target) * 100 : 0;
+  const voteProgress = proposal && (proposal.votesFor + proposal.votesAgainst) > 0
+    ? (proposal.votesFor / (proposal.votesFor + proposal.votesAgainst)) * 100
+    : 0;
+
   return (
-    <Box sx={{ p: 4, maxWidth: "800px", mx: "auto" }}>
-      <Typography variant="h4" gutterBottom>{campaign.title}</Typography>
-      {campaign.image && (
-        <Box component="img" src={campaign.image} alt={campaign.title} sx={{ width: "100%", maxHeight: "300px", objectFit: "cover", mb: 2 }} />
-      )}
-      <Typography variant="body1" paragraph>{campaign.description}</Typography>
-      <Typography variant="h6">Raised: {campaign.raised} ETH of {campaign.target} ETH</Typography>
-      <Typography variant="h6">Deadline: {new Date(campaign.deadline * 1000).toLocaleDateString()}</Typography>
-      <Typography variant="h6">Status: {campaign.state}</Typography>
-      {campaign.state === "Active" && account && (
-        <Box sx={{ mt: 3 }}>
-          <Typography variant="h6" gutterBottom>Donate to this Campaign</Typography>
-          <TextField label="Amount (ETH)" variant="outlined" type="number" value={donationAmount} onChange={(e) => setDonationAmount(e.target.value)} sx={{ mr: 2, width: "200px" }} inputProps={{ min: "0.0001", step: "0.0001" }} />
-          <Button variant="contained" onClick={handleDonate} disabled={isDonating || !donationAmount || parseFloat(donationAmount) <= 0} sx={{ mt: 1 }}>
-            {isDonating ? "Donating..." : "Donate"}
-          </Button>
+    <Box
+      sx={{
+        minHeight: "100vh",
+        backgroundImage: `url(${homeBackground})`,
+        backgroundRepeat: "no-repeat",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        p: 4,
+      }}
+    >
+      <Box
+        sx={{
+          maxWidth: "1200px",
+          width: "100%",
+          display: "flex",
+          gap: 4,
+        }}
+      >
+        {/* Column 1: Campaign Details */}
+        <Box sx={{ flex: 2, display: "flex", flexDirection: "column", gap: 2 }}>
+          <Typography variant="h4" sx={{ textAlign: "center", mb: 2, color: "#000" }}>
+            {campaign.title}
+          </Typography>
+          {campaign.image && (
+            <Box
+              component="img"
+              src={campaign.image}
+              alt={campaign.title}
+              sx={{
+                width: "100%",
+                maxHeight: "300px",
+                objectFit: "cover",
+                borderRadius: 2,
+              }}
+            />
+          )}
+          <Typography variant="body1" paragraph sx={{ color: "#000" }}>
+            {campaign.description}
+          </Typography>
+          <LinearProgress
+            variant="determinate"
+            value={progress}
+            sx={{
+              height: 10,
+              borderRadius: 5,
+              backgroundColor: "#e0e0e0",
+              "& .MuiLinearProgress-bar": { backgroundColor: "#4caf50" },
+            }}
+          />
+          <Typography variant="body2" sx={{ textAlign: "center", color: "#000" }}>
+            {campaign.raised} ETH of {campaign.target} ETH
+          </Typography>
+          <Typography variant="h6" sx={{ color: "#000" }}>
+            Deadline: {new Date(campaign.deadline * 1000).toLocaleDateString()}
+          </Typography>
+          <Typography variant="h6" sx={{ color: "#000" }}>
+            Status: {campaign.state}
+          </Typography>
+          <Box>
+            <Typography variant="h6" gutterBottom sx={{ color: "#000" }}>
+              Donators
+            </Typography>
+            {donators.length > 0 ? (
+              <Box
+                sx={{
+                  maxHeight: "200px",
+                  overflowY: "auto",
+                  border: "1px solid #e0e0e0",
+                  borderRadius: 1,
+                  p: 1,
+                }}
+              >
+                {donators.map((donator, index) => (
+                  <Typography key={index} variant="body2" sx={{ color: "#000" }}>
+                    {`${donator.address.slice(0, 6)}...${donator.address.slice(-4)}: ${donator.amount} ETH`}
+                  </Typography>
+                ))}
+              </Box>
+            ) : (
+              <Typography variant="body2" sx={{ color: "#000" }}>
+                No donators yet
+              </Typography>
+            )}
+          </Box>
         </Box>
-      )}
-      {proposal && !proposal.hasVoted && campaign.hasDonated && campaign.state === "Active" && (
-        <Box sx={{ mt: 3 }}>
-          <Typography variant="h6" gutterBottom>Deadline Extension Proposal</Typography>
-          <Typography variant="body1">Proposed extension: {proposal.proposedDays} days</Typography>
-          <Typography variant="body1">Voting ends: {new Date(proposal.voteEndTime * 1000).toLocaleString()}</Typography>
-          <Typography variant="body1">Votes For: {proposal.votesFor} ETH | Votes Against: {proposal.votesAgainst} ETH</Typography>
-          <RadioGroup row value={voteChoice} onChange={(e) => setVoteChoice(e.target.value)} sx={{ mt: 2 }}>
-            <FormControlLabel value="for" control={<Radio />} label="Vote For" />
-            <FormControlLabel value="against" control={<Radio />} label="Vote Against" />
-          </RadioGroup>
-          <Button variant="contained" onClick={handleVote} disabled={isVoting || !voteChoice} sx={{ mt: 1 }}>
-            {isVoting ? "Voting..." : "Submit Vote"}
-          </Button>
+
+        {/* Column 2: Donation and Voting */}
+        <Box sx={{ flex: 1, display: "flex", flexDirection: "column", gap: 2 }}>
+          {campaign.state === "Active" && account && (!proposal || !proposal.active) ? (
+            <Box
+              sx={{
+                p: 2,
+                border: "1px solid #e0e0e0",
+                borderRadius: 2,
+                backgroundColor: "#ffffff",
+              }}
+            >
+              <Typography variant="h6" gutterBottom sx={{ color: "#000" }}>
+                Donate to this Campaign
+              </Typography>
+              <TextField
+                label="Amount (ETH)"
+                variant="outlined"
+                type="number"
+                value={donationAmount}
+                onChange={(e) => setDonationAmount(e.target.value)}
+                sx={{ width: "100%", mb: 2 }}
+                inputProps={{ min: "0.0001", step: "0.0001" }}
+                InputLabelProps={{ style: { color: "#000" } }}
+                InputProps={{
+                  style: { color: "#000", borderColor: "#e0e0e0" },
+                }}
+              />
+              <Button
+                variant="outlined"
+                onClick={handleDonate}
+                disabled={
+                  isDonating || !donationAmount || parseFloat(donationAmount) <= 0
+                }
+                sx={{
+                  width: "100%",
+                  backgroundColor: "#ffffff",
+                  borderColor: "#e0e0e0",
+                  color: "#000",
+                  "&:hover": {
+                    borderColor: "#2196f3",
+                    backgroundColor: "#ffffff",
+                  },
+                  "&:disabled": {
+                    borderColor: "#e0e0e0",
+                    color: "#a0a0a0",
+                  },
+                }}
+              >
+                {isDonating ? "Donating..." : "Donate"}
+              </Button>
+            </Box>
+          ) : (
+            <Box
+              sx={{
+                p: 2,
+                border: "1px solid #e0e0e0",
+                borderRadius: 2,
+                backgroundColor: "#ffffff",
+              }}
+            >
+              <Typography variant="h6" gutterBottom sx={{ color: "#000" }}>
+                Donation Unavailable
+              </Typography>
+              <Typography variant="body2" sx={{ color: "#000" }}>
+                {campaign.state !== "Active"
+                  ? "This campaign is not active."
+                  : proposal && proposal.active
+                  ? "Donations paused during active proposal."
+                  : "Please connect your wallet to donate."}
+              </Typography>
+            </Box>
+          )}
+          <Box
+            sx={{
+              p: 2,
+              border: "1px solid #e0e0e0",
+              borderRadius: 2,
+              backgroundColor: "#ffffff",
+            }}
+          >
+            <Typography variant="h6" gutterBottom sx={{ color: "#000" }}>
+              Deadline Extension Proposal
+            </Typography>
+            {proposal && proposal.active && campaign.state === "Active" ? (
+              <>
+                <Typography variant="body1" sx={{ color: "#000" }}>
+                  Proposed extension: {proposal.proposedDays} days
+                </Typography>
+                <Typography variant="body1" sx={{ color: "#000" }}>
+                  Voting ends: {new Date(proposal.voteEndTime * 1000).toLocaleString()}
+                </Typography>
+                <Typography variant="body1" sx={{ color: "#000" }}>
+                  Votes For: {proposal.votesFor} ETH | Votes Against: {proposal.votesAgainst} ETH
+                </Typography>
+                <LinearProgress
+                  variant="determinate"
+                  value={voteProgress}
+                  sx={{
+                    height: 10,
+                    borderRadius: 5,
+                    mt: 1,
+                    backgroundColor: "#ffcccc",
+                    "& .MuiLinearProgress-bar": { backgroundColor: "#4caf50" },
+                  }}
+                />
+                <Typography variant="body2" sx={{ textAlign: "center", color: "#000", mt: 1 }}>
+                  {proposal.votesFor} ETH For vs {proposal.votesAgainst} ETH Against
+                </Typography>
+                {campaign.hasDonated ? (
+                  proposal.hasVoted ? (
+                    <Typography variant="body2" sx={{ color: "#000", mt: 2 }}>
+                      You have already voted.
+                    </Typography>
+                  ) : (
+                    <>
+                      <RadioGroup
+                        row
+                        value={voteChoice}
+                        onChange={(e) => setVoteChoice(e.target.value)}
+                        sx={{ mt: 2 }}
+                      >
+                        <FormControlLabel
+                          value="for"
+                          control={<Radio sx={{ color: "#000", "&.Mui-checked": { color: "#2196f3" } }} />}
+                          label={<Typography sx={{ color: "#000" }}>Vote For</Typography>}
+                        />
+                        <FormControlLabel
+                          value="against"
+                          control={<Radio sx={{ color: "#000", "&.Mui-checked": { color: "#2196f3" } }} />}
+                          label={<Typography sx={{ color: "#000" }}>Vote Against</Typography>}
+                        />
+                      </RadioGroup>
+                      <Button
+                        variant="outlined"
+                        onClick={handleVote}
+                        disabled={isVoting || !voteChoice}
+                        sx={{
+                          mt: 1,
+                          width: "100%",
+                          backgroundColor: "#ffffff",
+                          borderColor: "#e0e0e0",
+                          color: "#000",
+                          "&:hover": {
+                            borderColor: "#2196f3",
+                            backgroundColor: "#ffffff",
+                          },
+                          "&:disabled": {
+                            borderColor: "#e0e0e0",
+                            color: "#a0a0a0",
+                          },
+                        }}
+                      >
+                        {isVoting ? "Voting..." : "Submit Vote"}
+                      </Button>
+                    </>
+                  )
+                ) : (
+                  <Typography variant="body2" sx={{ color: "#000", mt: 2 }}>
+                    Only donators can vote on proposals.
+                  </Typography>
+                )}
+              </>
+            ) : (
+              <Typography variant="body2" sx={{ color: "#000" }}>
+                No active proposal at this time.
+              </Typography>
+            )}
+          </Box>
         </Box>
-      )}
+      </Box>
+
       {error && (
-        <Typography variant="body2" color="error" sx={{ mt: 2 }}>{error}</Typography>
+        <Typography
+          variant="body2"
+          color="error"
+          sx={{ mt: 2, textAlign: "center", width: "100%" }}
+        >
+          {error}
+        </Typography>
       )}
     </Box>
   );
