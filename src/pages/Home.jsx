@@ -105,7 +105,14 @@ const Home = ({ account, web3, factoryContract }) => {
             {campaigns.map((campaign) => (
               <Grid item xs={12} sm={6} md={4} key={campaign.campaignAddress}>
                 <Link to={`/campaign/${campaign.campaignAddress}`} style={{ textDecoration: "none" }}>
-                  <CampaignCard title={campaign.title} imageUrl={campaign.imageUrl} ownerAddress={campaign.ownerAddress} deadline={campaign.deadline} raised={campaign.raised} goal={campaign.goal} />
+                  <CampaignCard
+                    title={campaign.title}
+                    imageUrl={campaign.imageUrl}
+                    campaignAddress={campaign.campaignAddress}
+                    deadline={campaign.deadline}
+                    raised={campaign.raised}
+                    goal={campaign.goal}
+                  />
                 </Link>
               </Grid>
             ))}

@@ -2,10 +2,10 @@ import React from "react";
 import { Card, CardContent, Typography, Box, LinearProgress } from "@mui/material";
 import makeBlockie from "ethereum-blockies-base64";
 
-const CampaignCard = ({ title, imageUrl, ownerAddress, deadline, raised, goal }) => {
-  const defaultImage = "../assets/defualt.jpg";
+const CampaignCard = ({ title, imageUrl, campaignAddress, deadline, raised, goal }) => {
+  const defaultImage = "../assets/default.jpg";
   const displayImage = imageUrl || defaultImage;
-  const truncatedAddress = `${ownerAddress.slice(0, 6)}...${ownerAddress.slice(-4)}`;
+  const truncatedAddress = `${campaignAddress.slice(0, 6)}...${campaignAddress.slice(-4)}`;
   const currentTime = Math.floor(Date.now() / 1000);
   const remainingSeconds = deadline - currentTime;
   const remainingDays = remainingSeconds > 0 ? Math.ceil(remainingSeconds / (60 * 60 * 24)) : 0;
@@ -13,7 +13,7 @@ const CampaignCard = ({ title, imageUrl, ownerAddress, deadline, raised, goal })
   const hasFailed = hasEnded && raised < goal;
   const statusText = remainingDays > 0 ? `Days Left: ${remainingDays}` : hasFailed ? "Failed" : "Ended";
   const percentage = goal > 0 ? Math.min((raised / goal) * 100, 100) : 0;
-  const blockie = makeBlockie(ownerAddress);
+  const blockie = makeBlockie(campaignAddress);
 
   return (
     <Card
@@ -23,7 +23,7 @@ const CampaignCard = ({ title, imageUrl, ownerAddress, deadline, raised, goal })
         "&:hover": {
           transform: "translateY(-4px)",
           transition: "transform 0.3s ease",
-          cursor: "pointer", // Add this to indicate clickability
+          cursor: "pointer",
         },
         display: "flex",
         flexDirection: "column",
@@ -37,7 +37,7 @@ const CampaignCard = ({ title, imageUrl, ownerAddress, deadline, raised, goal })
         <Box sx={{ mb: 2 }}>
           <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
             <Box sx={{ mr: 1 }}>
-              <img src={blockie} alt="Owner Blockie" style={{ width: 30, height: 30, borderRadius: "50%" }} />
+              <img src={blockie} alt="Campaign Blockie" style={{ width: 32, height: 32, borderRadius: "50%" }} />
             </Box>
             <Box>
               <Typography variant="h6" component="div" sx={{ fontWeight: "bold" }}>
