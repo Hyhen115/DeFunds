@@ -10,16 +10,30 @@ import {
   LinearProgress,
   Paper,
   Box,
-  Button,
 } from "@mui/material";
 import makeBlockie from "ethereum-blockies-base64";
 
 const CampaignTable = ({ campaigns }) => {
   return (
-    <TableContainer component={Paper} sx={{ boxShadow: 3 }}>
-      <Table sx={{ minWidth: 650 }} aria-label="campaigns table">
+    <TableContainer component={Paper} sx={{ boxShadow: 3, overflowX: "auto" }}>
+      <Table
+        sx={{
+          minWidth: 650,
+          tableLayout: "fixed", // Prevent column resizing
+        }}
+        aria-label="campaigns table"
+      >
         <TableHead>
           <TableRow sx={{ backgroundColor: "#f9f9f9" }}>
+            <TableCell
+              sx={{
+                borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
+                width: "48px",
+                minWidth: "48px",
+                maxWidth: "48px",
+                padding: "8px",
+              }}
+            ></TableCell> {/* Empty header for icon */}
             <TableCell sx={{ fontWeight: "bold", color: "#000" }}>Address</TableCell>
             <TableCell sx={{ fontWeight: "bold", color: "#000" }}>Name</TableCell>
             <TableCell sx={{ fontWeight: "bold", color: "#000" }}>Status</TableCell>
@@ -31,48 +45,99 @@ const CampaignTable = ({ campaigns }) => {
         <TableBody>
           {campaigns.map((campaign, index) => {
             const fundingProgress = campaign.target > 0 ? (campaign.raised / campaign.target) * 100 : 0;
-            const voteProgress = campaign.proposalVotesFor !== undefined && campaign.proposalVotesAgainst !== undefined && (campaign.proposalVotesFor + campaign.proposalVotesAgainst) > 0
-              ? (campaign.proposalVotesFor / (campaign.proposalVotesFor + campaign.proposalVotesAgainst)) * 100
-              : 0;
-
-            // Determine the color for the status button
-            const statusColor =
-              campaign.status === "Success"
-                ? "#4caf50"
-                : campaign.status === "Fail"
-                ? "#f44336"
-                : "#1976d2"; // Blue for Active
+            const voteProgress =
+              campaign.proposalVotesFor !== undefined &&
+              campaign.proposalVotesAgainst !== undefined &&
+              (campaign.proposalVotesFor + campaign.proposalVotesAgainst) > 0
+                ? (campaign.proposalVotesFor / (campaign.proposalVotesFor + campaign.proposalVotesAgainst)) * 100
+                : 0;
 
             return (
               <TableRow key={index} sx={{ "&:hover": { backgroundColor: "#f9f9f9" } }}>
-                <TableCell sx={{ color: "#000", display: "flex", alignItems: "center", gap: 1 }}>
+                <TableCell
+                  sx={{
+                    minHeight: "48px",
+                    padding: "8px",
+                    borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
+                    width: "48px",
+                    minWidth: "48px",
+                    maxWidth: "48px",
+                    textAlign: "center",
+                  }}
+                >
                   <img
                     src={makeBlockie(campaign.address)}
                     alt="Address Icon"
-                    style={{ width: "24px", height: "24px", borderRadius: "50%" }}
+                    style={{
+                      width: "32px",
+                      height: "32px",
+                      borderRadius: "50%",
+                      display: "block",
+                      margin: "0 auto",
+                    }}
                   />
-                  {`${campaign.address.slice(0, 6)}...${campaign.address.slice(-4)}`}
                 </TableCell>
-                <TableCell sx={{ color: "#000" }}>{campaign.name}</TableCell>
-                <TableCell>
-                  <Button
-                    variant="outlined"
-                    disabled={true}
+                <TableCell
+                  sx={{
+                    color: "#000",
+                    minHeight: "48px",
+                    padding: "8px",
+                    borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
+                  }}
+                >
+                  <Typography variant="body2">
+                    {`${campaign.address.slice(0, 6)}...${campaign.address.slice(-4)}`}
+                  </Typography>
+                </TableCell>
+                <TableCell
+                  sx={{
+                    color: "#000",
+                    minHeight: "48px",
+                    padding: "8px",
+                    borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
+                  }}
+                >
+                  {campaign.name}
+                </TableCell>
+                <TableCell
+                  sx={{
+                    minHeight: "48px",
+                    padding: "8px",
+                    borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
+                  }}
+                >
+                  <Typography
+                    variant="body2"
                     sx={{
-                      color: statusColor,
-                      borderColor: statusColor,
-                      borderRadius: "20px",
-                      textTransform: "none",
-                      pointerEvents: "none", // Ensures no hover effects or clickability
+                      color:
+                        campaign.status === "Success"
+                          ? "#4caf50"
+                          : campaign.status === "Fail"
+                          ? "#f44336"
+                          : "#1976d2",
+                      fontWeight: "medium",
                     }}
                   >
                     {campaign.status}
-                  </Button>
+                  </Typography>
                 </TableCell>
-                <TableCell sx={{ color: "#000" }}>
+                <TableCell
+                  sx={{
+                    color: "#000",
+                    minHeight: "48px",
+                    padding: "8px",
+                    borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
+                  }}
+                >
                   {new Date(campaign.deadline).toLocaleDateString()}
                 </TableCell>
-                <TableCell>
+                <TableCell
+                  sx={{
+                    minHeight: "48px",
+                    padding: "8px",
+                    borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
+                  }}
+                >
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                     <Box sx={{ width: "150px" }}>
                       <LinearProgress
@@ -91,7 +156,13 @@ const CampaignTable = ({ campaigns }) => {
                     </Typography>
                   </Box>
                 </TableCell>
-                <TableCell>
+                <TableCell
+                  sx={{
+                    minHeight: "48px",
+                    padding: "8px",
+                    borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
+                  }}
+                >
                   {campaign.proposalActive ? (
                     <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
                       <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
