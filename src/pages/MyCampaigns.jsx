@@ -1,60 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, CircularProgress } from "@mui/material";
 import CampaignTable from "../components/CampaignTable";
+import { initializeCrowdfundContract } from "../utils/crowdfundContract";
 import homeBackground from "../assets/homeBackground.png";
 
-// Dummy data for campaigns, structured to match the new CampaignTable props
-const dummyCampaigns = [
-  {
-    address: "0x1234567890abcdef1234567890abcdef12345678",
-    name: "Eco-Friendly Housing Project",
-    status: "Active",
-    deadline: "2025-05-01",
-    raised: 15,
-    target: 50,
-    proposalActive: true,
-    proposalVotesFor: 10,
-    proposalVotesAgainst: 5,
-  },
-  {
-    address: "0xabcdef1234567890abcdef1234567890abcdef12",
-    name: "Community Garden Initiative",
-    status: "Success",
-    deadline: "2025-03-15",
-    raised: 30,
-    target: 25,
-    proposalActive: false,
-    proposalVotesFor: 0,
-    proposalVotesAgainst: 0,
-  },
-  {
-    address: "0x7890abcdef1234567890abcdef1234567890abcd",
-    name: "Local Library Renovation",
-    status: "Fail",
-    deadline: "2025-02-28",
-    raised: 5,
-    target: 20,
-    proposalActive: true,
-    proposalVotesFor: 3,
-    proposalVotesAgainst: 7,
-  },
-  {
-    address: "0x4567890abcdef1234567890abcdef1234567890",
-    name: "Youth Sports Program",
-    status: "Active",
-    deadline: "2025-06-10",
-    raised: 8,
-    target: 40,
-    proposalActive: false,
-    proposalVotesFor: 0,
-    proposalVotesAgainst: 0,
-  },
-];
-
 const MyCampaigns = ({ account, web3, factoryContract }) => {
-  const [campaigns, setCampaigns] = useState(dummyCampaigns);
+  const [campaigns, setCampaigns] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Placeholder for fetching campaigns from the contract
   useEffect(() => {
     const fetchMyCampaigns = async () => {
       if (!web3 || !factoryContract || !account) {
@@ -62,12 +15,71 @@ const MyCampaigns = ({ account, web3, factoryContract }) => {
         return;
       }
 
+      setIsLoading(true);
       try {
-        // TODO: Fetch campaigns from the factory contract and filter by owner
-        setCampaigns(dummyCampaigns); // Using dummy data for now
+        // Fetch campaigns owned by the connected account
+        const userCampaigns = await factoryContract.methods.getUserCampaigns(account).call();
+        const campaignPromises = userCampaigns.map(async (campaign) => {
+          const campaignContract = initializeCrowdfundContract(web3, campaign.campaignAddress);
+          if (!campaignContract) {
+            console.error("Failed to initialize campaign contract for address:", campaign.campaignAddress);
+            return null;
+          }
+
+          try {
+            const name = await campaignContract.methods.campaignName().call();
+            const state = await campaignContract.methods.getState().call();
+            const deadline = await campaignContract.methods.deadline().call();
+            const raised = await campaignContract.methods.getContractBalance().call();
+            const target = await campaignContract.methods.target().call();
+            const curProposal = await campaignContract.methods.curProposal().call();
+            const voteEndTime = await campaignContract.methods.voteEndTime().call();
+
+            // Convert state to string
+            let status;
+            switch (Number(state)) {
+              case 0:
+                status = "Active";
+                break;
+              case 1:
+                status = "Success";
+                break;
+              case 2:
+                status = "Fail";
+                break;
+              default:
+                console.warn("Unknown campaign state:", state);
+                status = "Unknown";
+            }
+
+            // Format deadline as ISO date string (YYYY-MM-DD)
+            const deadlineDate = new Date(Number(deadline) * 1000).toISOString().split("T")[0];
+
+            return {
+              address: campaign.campaignAddress,
+              name,
+              status,
+              deadline: deadlineDate,
+              raised: parseFloat(web3.utils.fromWei(raised, "ether")),
+              target: parseFloat(web3.utils.fromWei(target, "ether")),
+              proposalActive: curProposal.active && Number(voteEndTime) > Math.floor(Date.now() / 1000),
+              proposalVotesFor: parseFloat(web3.utils.fromWei(curProposal.votesFor, "ether")),
+              proposalVotesAgainst: parseFloat(web3.utils.fromWei(curProposal.votesAgainst, "ether")),
+            };
+          } catch (err) {
+            console.error("Error fetching data for campaign:", campaign.campaignAddress, err);
+            return null;
+          }
+        });
+
+        const campaignsData = await Promise.all(campaignPromises);
+        // Filter out null entries (failed fetches)
+        setCampaigns(campaignsData.filter((campaign) => campaign !== null));
       } catch (error) {
-        console.error("Error fetching campaigns:", error);
+        console.error("Error fetching user campaigns:", error);
         setCampaigns([]);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -83,12 +95,17 @@ const MyCampaigns = ({ account, web3, factoryContract }) => {
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
       }}
     >
       <Typography variant="h4" gutterBottom sx={{ color: "#000", mb: 3 }}>
         My Campaigns
       </Typography>
-      {!account ? (
+      {isLoading ? (
+        <CircularProgress sx={{ color: "#4caf50", mt: 4 }} />
+      ) : !account ? (
         <Typography variant="h6" sx={{ textAlign: "center", color: "#000" }}>
           Please connect to a wallet to view your campaigns.
         </Typography>

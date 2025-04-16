@@ -10,7 +10,9 @@ import {
   LinearProgress,
   Paper,
   Box,
+  Button,
 } from "@mui/material";
+import { Link } from "react-router-dom";
 import makeBlockie from "ethereum-blockies-base64";
 
 const CampaignTable = ({ campaigns }) => {
@@ -19,7 +21,7 @@ const CampaignTable = ({ campaigns }) => {
       <Table
         sx={{
           minWidth: 650,
-          tableLayout: "fixed", // Prevent column resizing
+          tableLayout: "fixed",
         }}
         aria-label="campaigns table"
       >
@@ -33,13 +35,22 @@ const CampaignTable = ({ campaigns }) => {
                 maxWidth: "48px",
                 padding: "8px",
               }}
-            ></TableCell> {/* Empty header for icon */}
+            ></TableCell>
             <TableCell sx={{ fontWeight: "bold", color: "#000" }}>Address</TableCell>
             <TableCell sx={{ fontWeight: "bold", color: "#000" }}>Name</TableCell>
             <TableCell sx={{ fontWeight: "bold", color: "#000" }}>Status</TableCell>
             <TableCell sx={{ fontWeight: "bold", color: "#000" }}>Deadline</TableCell>
             <TableCell sx={{ fontWeight: "bold", color: "#000" }}>Funding Progress</TableCell>
             <TableCell sx={{ fontWeight: "bold", color: "#000" }}>Deadline Extension Proposal</TableCell>
+            <TableCell
+              sx={{
+                borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
+                width: "120px",
+                minWidth: "120px",
+                maxWidth: "120px",
+                padding: "8px",
+              }}
+            ></TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -53,7 +64,14 @@ const CampaignTable = ({ campaigns }) => {
                 : 0;
 
             return (
-              <TableRow key={index} sx={{ "&:hover": { backgroundColor: "#f9f9f9" } }}>
+              <TableRow
+                key={index}
+                sx={{
+                  "&:hover": { backgroundColor: "#f9f9f9", cursor: "pointer" },
+                }}
+                component={Link}
+                to={`/campaign/${campaign.address}/manage`}
+              >
                 <TableCell
                   sx={{
                     minHeight: "48px",
@@ -191,6 +209,30 @@ const CampaignTable = ({ campaigns }) => {
                       Currently no deadline extension proposals.
                     </Typography>
                   )}
+                </TableCell>
+                <TableCell
+                  sx={{
+                    minHeight: "48px",
+                    padding: "8px",
+                    borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
+                    width: "120px",
+                    minWidth: "120px",
+                    maxWidth: "120px",
+                    textAlign: "center",
+                  }}
+                >
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    onClick={() => console.log("Withdraw clicked for", campaign.address)}
+                    sx={{
+                      textTransform: "none",
+                      color: "#4caf50",
+                      borderColor: "#4caf50",
+                    }}
+                  >
+                    Withdraw
+                  </Button>
                 </TableCell>
               </TableRow>
             );
