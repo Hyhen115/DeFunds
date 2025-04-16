@@ -70,7 +70,7 @@ const Navbar = ({ account, setAccount, setWeb3 }) => {
           Crowdfunding dApp
         </Typography>
         <Button
-          onClick={() => handleRestrictedClick("/campaigns")}
+          onClick={() => handleRestrictedClick("/mycampaign")}
           sx={{
             color: account ? "#000000" : "#A0A0A0",
             mx: 1,

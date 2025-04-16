@@ -4,7 +4,7 @@ import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import MyCampaigns from "./pages/MyCampaigns";
 import CreateCampaign from "./pages/CreateCampaign";
-import CampaignDetails from "./pages/CampaignDetails"; // Add this import
+import CampaignDetails from "./pages/CampaignDetails";
 import { initializeFactoryContract } from "./utils/factoryContract";
 
 const App = () => {
@@ -24,9 +24,9 @@ const App = () => {
       <Navbar account={account} setAccount={setAccount} setWeb3={setWeb3} />
       <Routes>
         <Route path="/" element={<Home account={account} web3={web3} factoryContract={factoryContract} />} />
-        <Route path="/campaigns" element={<MyCampaigns account={account} web3={web3} factoryContract={factoryContract} />} />
+        <Route path="/mycampaign" element={<MyCampaigns account={account} web3={web3} factoryContract={factoryContract} />} />
         <Route path="/create" element={<CreateCampaign account={account} web3={web3} factoryContract={factoryContract} />} />
-        <Route path="/campaign/:address" element={<CampaignDetails account={account} web3={web3} />} /> {/* Add this route */}
+        <Route path="/campaign/:address" element={<CampaignDetails account={account} web3={web3} />} />
       </Routes>
     </Router>
   );
