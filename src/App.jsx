@@ -5,6 +5,7 @@ import Home from "./pages/Home";
 import MyCampaigns from "./pages/MyCampaigns";
 import CreateCampaign from "./pages/CreateCampaign";
 import CampaignDetails from "./pages/CampaignDetails";
+import CampaignManage from "./pages/CampaignManage";
 import { initializeFactoryContract } from "./utils/factoryContract";
 
 const App = () => {
@@ -27,6 +28,7 @@ const App = () => {
         <Route path="/mycampaign" element={<MyCampaigns account={account} web3={web3} factoryContract={factoryContract} />} />
         <Route path="/create" element={<CreateCampaign account={account} web3={web3} factoryContract={factoryContract} />} />
         <Route path="/campaign/:address" element={<CampaignDetails account={account} web3={web3} />} />
+        <Route path="/campaign/:address/manage" element={<CampaignManage account={account} web3={web3} />} />
       </Routes>
     </Router>
   );
