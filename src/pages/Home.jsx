@@ -75,7 +75,7 @@ const Home = ({ account, web3, factoryContract }) => {
     <>
       <Box sx={{ minHeight: "100vh", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", textAlign: "center", p: 4, backgroundImage: `url(${homeBackground})`, backgroundRepeat: "no-repeat", backgroundSize: "cover", backgroundPosition: "center" }}>
         <Typography variant="h2" component="h1" sx={{ fontWeight: "bold", mb: 2, color: "#000" }}>
-          Welcome to Crowdfunding Dapp
+          Welcome to De Funds
         </Typography>
         <Typography variant="h6" sx={{ maxWidth: "600px", mb: 4, color: "#000" }}>
           Join our community of creators and supporters. Explore exciting projects and help bring innovative ideas to life.

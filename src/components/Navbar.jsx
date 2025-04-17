@@ -56,19 +56,24 @@ const Navbar = ({ account, setAccount, setWeb3 }) => {
       sx={{ backgroundColor: "#FFFFFF", borderBottom: "1px solid #E0E0E0" }}
     >
       <Toolbar sx={{ minHeight: 64 }}>
-        <Typography
-          variant="h6"
-          component={Link}
-          to="/"
-          sx={{
-            color: "#000000",
-            flexGrow: 0,
-            mr: 2,
-            textDecoration: "none",
-          }}
-        >
-          Crowdfunding dApp
-        </Typography>
+        <Link to="/" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
+          <img
+            src="src/assets/logo.png"
+            alt="De Funds Und Freedom Logo"
+            style={{ height: "50px", width: "auto", marginRight: "8px" }}
+          />
+          <Typography
+            variant="h6"
+            sx={{
+              color: "#000000",
+              flexGrow: 0,
+              textDecoration: "none",
+              fontWeight: "bold",
+            }}
+          >
+            De Funds
+          </Typography>
+        </Link>
         <Button
           onClick={() => handleRestrictedClick("/mycampaign")}
           sx={{
@@ -94,7 +99,7 @@ const Navbar = ({ account, setAccount, setWeb3 }) => {
                     border: "1px solid #000000",
                   }
                 : {
-                    color: "#A0A0A0",
+                    color: "none",
                     pointerEvents: "none",
                     border: "none",
                   }),
