@@ -27,8 +27,10 @@ const CampaignDetails = ({ web3, account }) => {
   const [error, setError] = useState("");
   const [isDonating, setIsDonating] = useState(false);
   const [isVoting, setIsVoting] = useState(false);
+  const [isRefunding, setIsRefunding] = useState(false);
   const [donators, setDonators] = useState([]);
-  const [imgSrc, setImgSrc] = useState(""); // Manage image source
+  const [imgSrc, setImgSrc] = useState("");
+  const [hasRefunded, setHasRefunded] = useState(false);
 
   useEffect(() => {
     const fetchCampaign = async () => {
@@ -51,6 +53,13 @@ const CampaignDetails = ({ web3, account }) => {
         const raised = await campaignContract.methods.getContractBalance().call();
         const state = await campaignContract.methods.getState().call();
         const hasDonated = await campaignContract.methods.hasDonated(account).call();
+
+        // Fetch hasRefunded
+        let hasRefunded = false;
+        if (hasDonated) {
+          const donationAmount = await campaignContract.methods.donationAmounts(account).call();
+          hasRefunded = donationAmount == 0;
+        }
 
         // Fetch donators
         const donatorsList = [];
@@ -100,8 +109,9 @@ const CampaignDetails = ({ web3, account }) => {
           hasDonated,
         });
 
-        setImgSrc(image); // Set initial image source
+        setImgSrc(image);
         setDonators(donatorsList);
+        setHasRefunded(hasRefunded);
 
         if (active && voteEndTime > Math.floor(Date.now() / 1000)) {
           setProposal({
@@ -153,6 +163,7 @@ const CampaignDetails = ({ web3, account }) => {
         return [...prev, { address: account, amount }];
       });
       setDonationAmount("");
+      setHasRefunded(false); // Reset hasRefunded since user donated
     } catch (err) {
       console.error("Donation error:", err);
       setError(
@@ -200,7 +211,40 @@ const CampaignDetails = ({ web3, account }) => {
     }
   };
 
-  // Handle image loading errors
+  const handleRefund = async () => {
+    if (!web3 || !account) return;
+    try {
+      setIsRefunding(true);
+      const campaignContract = initializeCrowdfundContract(web3, address);
+      await campaignContract.methods.refund().send({ from: account });
+      const raised = await campaignContract.methods.getContractBalance().call();
+      setCampaign((prev) => ({
+        ...prev,
+        raised: parseFloat(web3.utils.fromWei(raised, "ether")),
+      }));
+      setDonators((prev) =>
+        prev.map((d) =>
+          d.address === account ? { ...d, amount: 0 } : d
+        ).filter((d) => d.amount > 0)
+      );
+      setHasRefunded(true);
+      setError("");
+    } catch (err) {
+      console.error("Refund error:", err);
+      setError(
+        err.message.includes("Campaign not failed")
+          ? "Refunds are only available for failed campaigns"
+          : err.message.includes("No donation found")
+          ? "Only donators can request a refund"
+          : err.message.includes("Already refunded")
+          ? "You have already requested a refund"
+          : "Failed to process refund"
+      );
+    } finally {
+      setIsRefunding(false);
+    }
+  };
+
   const handleImageError = () => {
     setImgSrc("https://via.placeholder.com/300?text=No+Image");
   };
@@ -371,7 +415,7 @@ const CampaignDetails = ({ web3, account }) => {
           </Box>
         </Paper>
 
-        {/* Column 2: Donation and Voting */}
+        {/* Column 2: Donation, Voting, and Refund */}
         <Box sx={{ flex: 1, display: "flex", flexDirection: "column", gap: 2 }}>
           {campaign.state === "Active" && account && (!proposal || !proposal.active) ? (
             <Box
@@ -448,7 +492,7 @@ const CampaignDetails = ({ web3, account }) => {
               borderRadius: 2,
               backgroundColor: "#ffffff",
             }}
-            >
+          >
             <Typography variant="h6" gutterBottom sx={{ color: "#000" }}>
               Deadline Extension Proposal
             </Typography>
@@ -537,6 +581,53 @@ const CampaignDetails = ({ web3, account }) => {
               </Typography>
             )}
           </Box>
+          {campaign.state === "Fail" && (
+            <Box
+              sx={{
+                p: 2,
+                border: "1px solid #e0e0e0",
+                borderRadius: 2,
+                backgroundColor: "#ffffff",
+              }}
+            >
+              <Typography variant="h6" gutterBottom sx={{ color: "#000" }}>
+                Request Refund
+              </Typography>
+              {account && campaign.hasDonated ? (
+                hasRefunded ? (
+                  <Typography variant="body2" sx={{ color: "#000" }}>
+                    You have already requested a refund.
+                  </Typography>
+                ) : (
+                  <Button
+                    variant="outlined"
+                    onClick={handleRefund}
+                    disabled={isRefunding}
+                    sx={{
+                      width: "100%",
+                      backgroundColor: "#ffffff",
+                      borderColor: "#e0e0e0",
+                      color: "#000",
+                      "&:hover": {
+                        borderColor: "#2196f3",
+                        backgroundColor: "#ffffff",
+                      },
+                      "&:disabled": {
+                        borderColor: "#e0e0e0",
+                        color: "#a0a0a0",
+                      },
+                    }}
+                  >
+                    {isRefunding ? "Refunding..." : "Request Refund"}
+                  </Button>
+                )
+              ) : (
+                <Typography variant="body2" sx={{ color: "#000" }}>
+                  Only donators can request a refund.
+                </Typography>
+              )}
+            </Box>
+          )}
         </Box>
       </Box>
 
