@@ -3,7 +3,7 @@
 A **decentralized crowdfunding platform with voting mechanism** built with **React**, **Vite**, **web3.js**, **TailwinfCSS**, **Material-UI**, **Boostrap** and **Ethereum**, **Solidity**. Users can create and fund campaigns using Ether, with campaign images uploaded via **Cloudinary**. Smart contracts (`Crowdfund` and `CrowdfundFactory`) manage campaign logic, ensuring transparency and security.
 
 ## Table of Content
-- [Description]()
+- [Description](https://github.com/Hyhen115/crowdfunding-dapp?tab=readme-ov-file#description)
 - [Table of Content](https://github.com/Hyhen115/crowdfunding-dapp#table-of-content)
 - [App Preview](https://github.com/Hyhen115/crowdfunding-dapp?tab=readme-ov-file#app-preview)
   - [Connect your MetaMask Wallet & Explore Different Campaigns](https://github.com/Hyhen115/crowdfunding-dapp?tab=readme-ov-file#connect-your-metamask-wallet--explore-different-campaigns)
