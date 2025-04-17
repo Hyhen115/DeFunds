@@ -12,10 +12,12 @@ A decentralized crowdfunding platform with voting mechanism built with **React**
 
 ## App preview
 #### Connect your MetaMask Wallet & Explore Different Campaigns
-![dapp-v1](https://github.com/user-attachments/assets/f8ba98a6-75d2-43ff-8345-489c683b6a16)
+![dapp-v1](https://github.com/user-attachments/assets/55d096f3-7725-44f5-b729-cf839c52ee7b)
 #### Create & Manage your own Campaigns
-
+![dapp-v2](https://github.com/user-attachments/assets/84206ea2-b286-4095-9b24-f0c2b7853d68)
 #### Donate & Vote for your supported Campaigns
+
+#### Get Funds for your Projects
 
 #### Refund if Campaigns are Failed
 
