@@ -1,29 +1,21 @@
-# Crowdfunding-Dapp
-
-A decentralized crowdfunding platform with voting mechanism built with **React**, **Vite**, **web3.js**, **TailwinfCSS**, **Material-UI**, **Boostrap** and **Ethereum**, **Solidity**. Users can create and fund campaigns using Ether, with campaign images uploaded via **Cloudinary**. Smart contracts (`Crowdfund` and `CrowdfundFactory`) manage campaign logic, ensuring transparency and security.
-## progress
-- design ✅
-- contract development ✅
-- deploy contract ✅
-- UI development ✅
-- readme [ing]
-- Unit Testing [ing]
-- Report & Documentations
+# De Funds
+## Description
+A **decentralized crowdfunding platform with voting mechanism** built with **React**, **Vite**, **web3.js**, **TailwinfCSS**, **Material-UI**, **Boostrap** and **Ethereum**, **Solidity**. Users can create and fund campaigns using Ether, with campaign images uploaded via **Cloudinary**. Smart contracts (`Crowdfund` and `CrowdfundFactory`) manage campaign logic, ensuring transparency and security.
 
 ## Table of Content
-
-- [Table of Content](https://github.com/Hyhen115/crowdfunding-dapp/edit/main/README.md#progress)
+- [Description]()
+- [Table of Content](https://github.com/Hyhen115/crowdfunding-dapp#table-of-content)
 - [App Preview](https://github.com/Hyhen115/crowdfunding-dapp?tab=readme-ov-file#app-preview)
-- [Connect your MetaMask Wallet & Explore Different Campaigns](https://github.com/Hyhen115/crowdfunding-dapp?tab=readme-ov-file#connect-your-metamask-wallet--explore-different-campaigns)
-- [Create & Manage your own Campaigns](https://github.com/Hyhen115/crowdfunding-dapp?tab=readme-ov-file#create--manage-your-own-campaigns)
-- [Propose Deadline Extensions](https://github.com/Hyhen115/crowdfunding-dapp?tab=readme-ov-file#propose-deadline-extensions)
-- [Donate & Vote for your supported Campaigns](https://github.com/Hyhen115/crowdfunding-dapp?tab=readme-ov-file#donate--vote-for-your-supported-campaigns)
-- [Get Funds for your Projects](https://github.com/Hyhen115/crowdfunding-dapp?tab=readme-ov-file#get-funds-for-your-projects)
-- [Refund if Campaigns are Failed](https://github.com/Hyhen115/crowdfunding-dapp?tab=readme-ov-file#refund-if-campaigns-are-failed)
-- [Library used](https://github.com/Hyhen115/crowdfunding-dapp?tab=readme-ov-file#library-used)
+  - [Connect your MetaMask Wallet & Explore Different Campaigns](https://github.com/Hyhen115/crowdfunding-dapp?tab=readme-ov-file#connect-your-metamask-wallet--explore-different-campaigns)
+  - [Create & Manage your own Campaigns](https://github.com/Hyhen115/crowdfunding-dapp?tab=readme-ov-file#create--manage-your-own-campaigns)
+  - [Propose Deadline Extensions](https://github.com/Hyhen115/crowdfunding-dapp?tab=readme-ov-file#propose-deadline-extensions)
+  - [Donate & Vote for your supported Campaigns](https://github.com/Hyhen115/crowdfunding-dapp?tab=readme-ov-file#donate--vote-for-your-supported-campaigns)
+  - [Get Funds for your Projects](https://github.com/Hyhen115/crowdfunding-dapp?tab=readme-ov-file#get-funds-for-your-projects)
+  - [Refund if Campaigns are Failed](https://github.com/Hyhen115/crowdfunding-dapp?tab=readme-ov-file#refund-if-campaigns-are-failed)
+- [Libraries](https://github.com/Hyhen115/crowdfunding-dapp?tab=readme-ov-file#libraries)
 - [Running](https://github.com/Hyhen115/crowdfunding-dapp?tab=readme-ov-file#running)
-- [Prerequisites](https://github.com/Hyhen115/crowdfunding-dapp/edit/main/README.md#prerequisites)
-- [Installation](https://github.com/Hyhen115/crowdfunding-dapp/edit/main/README.md#installation)
+  - [Prerequisites](https://github.com/Hyhen115/crowdfunding-dapp?tab=readme-ov-file#prerequisites)
+  - [Installation](https://github.com/Hyhen115/crowdfunding-dapp?tab=readme-ov-file#installation)
 
 ## App Preview
 #### Connect your MetaMask Wallet & Explore Different Campaigns
@@ -39,7 +31,7 @@ A decentralized crowdfunding platform with voting mechanism built with **React**
 
 #### Refund if Campaigns are Failed
 
-## Library used
+## Libraries
 - react
 - vite
 - tailwindcss
