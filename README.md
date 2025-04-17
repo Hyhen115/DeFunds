@@ -2,21 +2,17 @@
 
 A decentralized crowdfunding platform with voting mechanism built with **React**, **Vite**, **web3.js**, **TailwinfCSS**, **Material-UI**, **Boostrap** and **Ethereum**, **Solidity**. Users can create and fund campaigns using Ether, with campaign images uploaded via **Cloudinary**. Smart contracts (`Crowdfund` and `CrowdfundFactory`) manage campaign logic, ensuring transparency and security.
 
-## Table of Contents
-- [Overview](#overview)
-- [Features](#features)
-- [Requirements](#requirements)
-- [Setup](#setup)
+## App preview
+#### Connect your MetaMask Wallet & Explore Different Campaigns
+![dapp-v1](https://github.com/user-attachments/assets/f8ba98a6-75d2-43ff-8345-489c683b6a16)
+#### Create & Manage your own Campaigns
 
+#### Donate & Vote for your supported Campaigns
 
-## Overview
+#### Refund if Campaigns are Failed
 
-
-## Features
-- **unique voting system** letting donators can vote on agreement for deadline extensions proposed by campaign owners
-- **Transparent and Decentralised** crowdfunding activities
+## Library used
 
 ## Getting Started
 
-
-## Setup
+## Running
