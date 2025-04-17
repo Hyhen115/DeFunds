@@ -329,9 +329,10 @@ const CreateCampaign = ({ web3, account, factoryContract }) => {
                   textTransform: "none",
                 }}
                 component={Link}
-                href={`/campaign/${newCampaignAddress}`}
+                href="/mycampaign"
+                disabled={!account}
               >
-                View Campaign
+                View My Campaigns
               </Button>
               <Button
                 variant="outlined"
