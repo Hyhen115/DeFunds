@@ -10,9 +10,12 @@ import {
   Radio,
   RadioGroup,
   LinearProgress,
+  Paper,
+  CardMedia,
 } from "@mui/material";
 import { initializeCrowdfundContract } from "../utils/crowdfundContract.js";
 import homeBackground from "../assets/homeBackground.png";
+import defaultImage from "../assets/defualt.jpg"; // Fallback image
 
 const CampaignDetails = ({ web3, account }) => {
   const { address } = useParams();
@@ -25,6 +28,7 @@ const CampaignDetails = ({ web3, account }) => {
   const [isDonating, setIsDonating] = useState(false);
   const [isVoting, setIsVoting] = useState(false);
   const [donators, setDonators] = useState([]);
+  const [imgSrc, setImgSrc] = useState(""); // Manage image source
 
   useEffect(() => {
     const fetchCampaign = async () => {
@@ -41,28 +45,20 @@ const CampaignDetails = ({ web3, account }) => {
         // Fetch campaign details
         const title = await campaignContract.methods.campaignName().call();
         const description = await campaignContract.methods.description().call();
-        const image = await campaignContract.methods.image().call();
+        const image = await campaignContract.methods.image().call() || defaultImage;
         const target = await campaignContract.methods.target().call();
         const deadline = await campaignContract.methods.deadline().call();
-        const raised = await campaignContract.methods
-          .getContractBalance()
-          .call();
+        const raised = await campaignContract.methods.getContractBalance().call();
         const state = await campaignContract.methods.getState().call();
-        const hasDonated = await campaignContract.methods
-          .hasDonated(account)
-          .call();
+        const hasDonated = await campaignContract.methods.hasDonated(account).call();
 
         // Fetch donators
         const donatorsList = [];
         let i = 0;
         while (true) {
           try {
-            const donatorAddr = await campaignContract.methods
-              .donators(i)
-              .call();
-            const amount = await campaignContract.methods
-              .donationAmounts(donatorAddr)
-              .call();
+            const donatorAddr = await campaignContract.methods.donators(i).call();
+            const amount = await campaignContract.methods.donationAmounts(donatorAddr).call();
             donatorsList.push({
               address: donatorAddr,
               amount: parseFloat(web3.utils.fromWei(amount, "ether")),
@@ -74,22 +70,18 @@ const CampaignDetails = ({ web3, account }) => {
         }
 
         // Fetch proposal details
-        const proposalData = await campaignContract.methods
-          .curProposal()
-          .call();
+        const proposalData = await campaignContract.methods.curProposal().call();
         const proposedDays = proposalData.proposedDays;
         const votesFor = proposalData.votesFor;
         const votesAgainst = proposalData.votesAgainst;
         const active = proposalData.active;
         const voteEndTime = await campaignContract.methods.voteEndTime().call();
 
-        // Check hasVoted by attempting a static call to voteOnDeadlineExtension
+        // Check hasVoted
         let hasVoted = false;
         if (active && hasDonated) {
           try {
-            await campaignContract.methods
-              .voteOnDeadlineExtension(true)
-              .call({ from: account });
+            await campaignContract.methods.voteOnDeadlineExtension(true).call({ from: account });
           } catch (err) {
             if (err.message.includes("already voted")) {
               hasVoted = true;
@@ -108,6 +100,7 @@ const CampaignDetails = ({ web3, account }) => {
           hasDonated,
         });
 
+        setImgSrc(image); // Set initial image source
         setDonators(donatorsList);
 
         if (active && voteEndTime > Math.floor(Date.now() / 1000)) {
@@ -140,9 +133,7 @@ const CampaignDetails = ({ web3, account }) => {
       setIsDonating(true);
       const campaignContract = initializeCrowdfundContract(web3, address);
       const amountInWei = web3.utils.toWei(donationAmount, "ether");
-      await campaignContract.methods
-        .donate()
-        .send({ from: account, value: amountInWei });
+      await campaignContract.methods.donate().send({ from: account, value: amountInWei });
       const raised = await campaignContract.methods.getContractBalance().call();
       const state = await campaignContract.methods.getState().call();
       const amount = parseFloat(web3.utils.fromWei(amountInWei, "ether"));
@@ -182,9 +173,7 @@ const CampaignDetails = ({ web3, account }) => {
       setIsVoting(true);
       const campaignContract = initializeCrowdfundContract(web3, address);
       const voteFor = voteChoice === "for";
-      await campaignContract.methods
-        .voteOnDeadlineExtension(voteFor)
-        .send({ from: account });
+      await campaignContract.methods.voteOnDeadlineExtension(voteFor).send({ from: account });
       const proposalData = await campaignContract.methods.curProposal().call();
       setProposal((prev) => ({
         ...prev,
@@ -211,6 +200,11 @@ const CampaignDetails = ({ web3, account }) => {
     }
   };
 
+  // Handle image loading errors
+  const handleImageError = () => {
+    setImgSrc("https://via.placeholder.com/300?text=No+Image");
+  };
+
   if (loading) {
     return (
       <Box
@@ -226,7 +220,7 @@ const CampaignDetails = ({ web3, account }) => {
           alignItems: "center",
         }}
       >
-        <CircularProgress />
+        <CircularProgress sx={{ color: "#4caf50" }} />
         <Typography variant="h6" sx={{ mt: 2, color: "#000" }}>
           Loading campaign...
         </Typography>
@@ -257,9 +251,10 @@ const CampaignDetails = ({ web3, account }) => {
   }
 
   const progress = campaign.target > 0 ? (campaign.raised / campaign.target) * 100 : 0;
-  const voteProgress = proposal && (proposal.votesFor + proposal.votesAgainst) > 0
-    ? (proposal.votesFor / (proposal.votesFor + proposal.votesAgainst)) * 100
-    : 0;
+  const voteProgress =
+    proposal && (proposal.votesFor + proposal.votesAgainst) > 0
+      ? (proposal.votesFor / (proposal.votesFor + proposal.votesAgainst)) * 100
+      : 0;
 
   return (
     <Box
@@ -280,25 +275,37 @@ const CampaignDetails = ({ web3, account }) => {
           maxWidth: "1200px",
           width: "100%",
           display: "flex",
+          flexDirection: { xs: "column", md: "row" },
           gap: 4,
         }}
       >
-        {/* Column 1: Campaign Details */}
-        <Box sx={{ flex: 2, display: "flex", flexDirection: "column", gap: 2 }}>
-          <Typography variant="h4" sx={{ textAlign: "center", mb: 2, color: "#000" }}>
+        {/* Column 1: Campaign Details Card */}
+        <Paper
+          sx={{
+            p: 3,
+            boxShadow: 3,
+            flex: 2,
+            width: { xs: "100%", md: "auto" },
+            backgroundColor: "#ffffff",
+          }}
+        >
+          <Typography variant="h5" sx={{ textAlign: "center", mb: 2, color: "#000" }}>
             {campaign.title}
           </Typography>
           {campaign.image && (
-            <Box
+            <CardMedia
               component="img"
-              src={campaign.image}
+              image={imgSrc}
               alt={campaign.title}
               sx={{
-                width: "100%",
+                maxWidth: "100%",
+                height: "auto",
                 maxHeight: "300px",
                 objectFit: "cover",
                 borderRadius: 2,
+                mb: 2,
               }}
+              onError={handleImageError}
             />
           )}
           <Typography variant="body1" paragraph sx={{ color: "#000" }}>
@@ -312,16 +319,29 @@ const CampaignDetails = ({ web3, account }) => {
               borderRadius: 5,
               backgroundColor: "#e0e0e0",
               "& .MuiLinearProgress-bar": { backgroundColor: "#4caf50" },
+              mb: 2,
             }}
           />
-          <Typography variant="body2" sx={{ textAlign: "center", color: "#000" }}>
+          <Typography variant="body2" sx={{ textAlign: "center", color: "#000", mb: 2 }}>
             {campaign.raised} ETH of {campaign.target} ETH
           </Typography>
-          <Typography variant="h6" sx={{ color: "#000" }}>
-            Deadline: {new Date(campaign.deadline * 1000).toLocaleDateString()}
+          <Typography variant="body1" sx={{ color: "#000", mb: 1 }}>
+            <strong>Deadline:</strong> {new Date(campaign.deadline * 1000).toLocaleDateString()}
           </Typography>
-          <Typography variant="h6" sx={{ color: "#000" }}>
-            Status: {campaign.state}
+          <Typography variant="body1" sx={{ color: "#000", mb: 2 }}>
+            <strong>Status:</strong>{" "}
+            <span
+              style={{
+                color:
+                  campaign.state === "Success"
+                    ? "#4caf50"
+                    : campaign.state === "Fail"
+                    ? "#f44336"
+                    : "#1976d2",
+              }}
+            >
+              {campaign.state}
+            </span>
           </Typography>
           <Box>
             <Typography variant="h6" gutterBottom sx={{ color: "#000" }}>
@@ -349,7 +369,7 @@ const CampaignDetails = ({ web3, account }) => {
               </Typography>
             )}
           </Box>
-        </Box>
+        </Paper>
 
         {/* Column 2: Donation and Voting */}
         <Box sx={{ flex: 1, display: "flex", flexDirection: "column", gap: 2 }}>
@@ -381,9 +401,7 @@ const CampaignDetails = ({ web3, account }) => {
               <Button
                 variant="outlined"
                 onClick={handleDonate}
-                disabled={
-                  isDonating || !donationAmount || parseFloat(donationAmount) <= 0
-                }
+                disabled={isDonating || !donationAmount || parseFloat(donationAmount) <= 0}
                 sx={{
                   width: "100%",
                   backgroundColor: "#ffffff",
@@ -430,7 +448,7 @@ const CampaignDetails = ({ web3, account }) => {
               borderRadius: 2,
               backgroundColor: "#ffffff",
             }}
-          >
+            >
             <Typography variant="h6" gutterBottom sx={{ color: "#000" }}>
               Deadline Extension Proposal
             </Typography>
