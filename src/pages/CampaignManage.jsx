@@ -9,10 +9,11 @@ import {
   TextField,
   LinearProgress,
   Paper,
-  Grid,
+  CardMedia,
 } from "@mui/material";
 import { initializeCrowdfundContract } from "../utils/crowdfundContract";
 import homeBackground from "../assets/homeBackground.png";
+import campaignImage from "../assets/defualt.jpg"; // Fallback placeholder
 
 const CampaignManage = ({ account, web3 }) => {
   const { address } = useParams();
@@ -47,6 +48,7 @@ const CampaignManage = ({ account, web3 }) => {
         const curProposal = await campaignContract.methods.curProposal().call();
         const voteEndTime = await campaignContract.methods.voteEndTime().call();
         const owner = await campaignContract.methods.owner().call();
+        const image = await campaignContract.methods.image().call() || campaignImage;
 
         let status;
         switch (Number(state)) {
@@ -78,6 +80,7 @@ const CampaignManage = ({ account, web3 }) => {
           proposalVotesAgainst: parseFloat(web3.utils.fromWei(curProposal.votesAgainst, "ether")),
           proposedDays: Number(curProposal.proposedDays),
           owner,
+          image,
         });
       } catch (error) {
         console.error("Error fetching campaign data:", error);
@@ -207,29 +210,51 @@ const CampaignManage = ({ account, web3 }) => {
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
+        display: "flex",
+        justifyContent: "center",
       }}
     >
-      <Typography variant="h4" gutterBottom sx={{ color: "#000", mb: 3 }}>
-        Manage Campaign
-      </Typography>
-      {alert.open && (
-        <Alert
-          severity={alert.severity}
-          onClose={handleCloseAlert}
-          sx={{ mb: 2, width: "100%", maxWidth: "600px" }}
-        >
-          {alert.message}
-        </Alert>
-      )}
-      {!campaign ? (
-        <Typography variant="h6" sx={{ textAlign: "center", color: "#000" }}>
-          Campaign not found.
+      <Box sx={{ width: "100%", maxWidth: "1200px" }}>
+        <Typography variant="h4" gutterBottom sx={{ color: "#000", mb: 3, textAlign: "center" }}>
+          Manage Campaign
         </Typography>
-      ) : (
-        <Grid container spacing={3}>
-          {/* Left Column: Campaign Details */}
-          <Grid item xs={12} md={8}>
-            <Paper sx={{ p: 3, boxShadow: 3 }}>
+        {alert.open && (
+          <Alert
+            severity={alert.severity}
+            onClose={handleCloseAlert}
+            sx={{ mb: 2, width: "100%", maxWidth: "600px", mx: "auto" }}
+          >
+            {alert.message}
+          </Alert>
+        )}
+        {!campaign ? (
+          <Typography variant="h6" sx={{ textAlign: "center", color: "#000" }}>
+            Campaign not found.
+          </Typography>
+        ) : (
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: { xs: "column", md: "row" },
+              gap: 3,
+              alignItems: { xs: "center", md: "flex-start" },
+            }}
+          >
+            {/* Campaign Details */}
+            <Paper
+              sx={{
+                p: 3,
+                boxShadow: 3,
+                width: { xs: "100%", md: "60%" },
+                maxWidth: "700px",
+              }}
+            >
+              <CardMedia
+                component="img"
+                image={campaign.image}
+                alt="Campaign Image"
+                sx={{ maxWidth: "100%", height: "auto", borderRadius: 2, mb: 2 }}
+              />
               <Typography variant="h5" sx={{ color: "#000", mb: 2 }}>
                 {campaign.name}
               </Typography>
@@ -270,10 +295,16 @@ const CampaignManage = ({ account, web3 }) => {
                 />
               </Box>
             </Paper>
-          </Grid>
-          {/* Right Column: Withdraw and Proposal */}
-          <Grid item xs={12} md={4}>
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+            {/* Withdraw and Proposal Boxes */}
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 3,
+                width: { xs: "100%", md: "40%" },
+                maxWidth: "400px",
+              }}
+            >
               {/* Withdraw Box */}
               <Paper sx={{ p: 3, boxShadow: 3 }}>
                 <Typography variant="h6" sx={{ color: "#000", mb: 2 }}>
@@ -371,9 +402,9 @@ const CampaignManage = ({ account, web3 }) => {
                 </Typography>
               </Paper>
             </Box>
-          </Grid>
-        </Grid>
-      )}
+          </Box>
+        )}
+      </Box>
     </Box>
   );
 };

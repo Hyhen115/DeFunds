@@ -1,10 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardContent, Typography, Box, LinearProgress } from "@mui/material";
 import makeBlockie from "ethereum-blockies-base64";
+import defaultImage from "../assets/defualt.jpg"; // Corrected import
 
 const CampaignCard = ({ title, imageUrl, campaignAddress, deadline, raised, goal }) => {
-  const defaultImage = "../assets/default.jpg";
-  const displayImage = imageUrl || defaultImage;
+  const [imgSrc, setImgSrc] = useState(imageUrl || defaultImage);
   const truncatedAddress = `${campaignAddress.slice(0, 6)}...${campaignAddress.slice(-4)}`;
   const currentTime = Math.floor(Date.now() / 1000);
   const remainingSeconds = deadline - currentTime;
@@ -14,6 +14,11 @@ const CampaignCard = ({ title, imageUrl, campaignAddress, deadline, raised, goal
   const statusText = remainingDays > 0 ? `Days Left: ${remainingDays}` : hasFailed ? "Failed" : "Ended";
   const percentage = goal > 0 ? Math.min((raised / goal) * 100, 100) : 0;
   const blockie = makeBlockie(campaignAddress);
+
+  // Fallback to a placeholder if both imageUrl and defaultImage fail
+  const handleImageError = () => {
+    setImgSrc("https://via.placeholder.com/150?text=No+Image");
+  };
 
   return (
     <Card
@@ -32,7 +37,12 @@ const CampaignCard = ({ title, imageUrl, campaignAddress, deadline, raised, goal
     >
       <CardContent sx={{ flexGrow: 1 }}>
         <Box sx={{ mb: 2, display: "flex", justifyContent: "center", alignItems: "center", height: "150px", overflow: "hidden" }}>
-          <img src={displayImage} alt={title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+          <img
+            src={imgSrc}
+            alt={title}
+            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+            onError={handleImageError}
+          />
         </Box>
         <Box sx={{ mb: 2 }}>
           <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
