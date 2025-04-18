@@ -1,25 +1,10 @@
 import React, { useRef, useState, useEffect } from "react";
-import { Box, Typography, Grid, Button, CircularProgress } from "@mui/material";
+import { Box, Typography, Grid, Button } from "@mui/material";
 import { Link } from "react-router-dom";
 import CampaignCard from "../components/CampaignCard";
 import { initializeCrowdfundContract } from "../utils/crowdfundContract.js";
 import homeBackground from "../assets/homeBackground.png";
-
-function GradientCircularProgress() {
-  return (
-    <React.Fragment>
-      <svg width={0} height={0}>
-        <defs>
-          <linearGradient id="my_gradient" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="#e01cd5" />
-            <stop offset="100%" stopColor="#1CB5E0" />
-          </linearGradient>
-        </defs>
-      </svg>
-      <CircularProgress sx={{ "svg circle": { stroke: "url(#my_gradient)" } }} />
-    </React.Fragment>
-  );
-}
+import GradientCircularProgress from "../components/GradientCircularProgress";
 
 const Home = ({ account, web3, factoryContract }) => {
   const [campaigns, setCampaigns] = useState([]);

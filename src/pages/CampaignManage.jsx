@@ -3,7 +3,6 @@ import { useParams } from "react-router-dom";
 import {
   Box,
   Typography,
-  CircularProgress,
   Alert,
   Button,
   TextField,
@@ -14,6 +13,7 @@ import {
 import { initializeCrowdfundContract } from "../utils/crowdfundContract";
 import homeBackground from "../assets/homeBackground.png";
 import campaignImage from "../assets/defualt.jpg"; // Fallback placeholder
+import GradientCircularProgress from "../components/GradientCircularProgress";
 
 const CampaignManage = ({ account, web3 }) => {
   const { address } = useParams();
@@ -198,7 +198,7 @@ const CampaignManage = ({ account, web3 }) => {
           alignItems: "center",
         }}
       >
-        <CircularProgress sx={{ color: "#4caf50" }} />
+        <GradientCircularProgress />
       </Box>
     );
   }

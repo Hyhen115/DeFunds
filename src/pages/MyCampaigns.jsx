@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { Box, Typography, CircularProgress } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import CampaignTable from "../components/CampaignTable";
 import { initializeCrowdfundContract } from "../utils/crowdfundContract";
 import homeBackground from "../assets/homeBackground.png";
+import GradientCircularProgress from "../components/GradientCircularProgress";
 
 const MyCampaigns = ({ account, web3, factoryContract }) => {
   const [campaigns, setCampaigns] = useState([]);
@@ -106,7 +107,7 @@ const MyCampaigns = ({ account, web3, factoryContract }) => {
         My Campaigns
       </Typography>
       {isLoading ? (
-        <CircularProgress sx={{ color: "#4caf50", mt: 4 }} />
+        <GradientCircularProgress sx={{ mt: 4 }} />
       ) : !account ? (
         <Typography variant="h6" sx={{ textAlign: "center", color: "#000" }}>
           Please connect to a wallet to view your campaigns.

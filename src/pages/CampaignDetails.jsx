@@ -5,7 +5,6 @@ import {
   Typography,
   Button,
   TextField,
-  CircularProgress,
   FormControlLabel,
   Radio,
   RadioGroup,
@@ -16,6 +15,7 @@ import {
 import { initializeCrowdfundContract } from "../utils/crowdfundContract.js";
 import homeBackground from "../assets/homeBackground.png";
 import defaultImage from "../assets/defualt.jpg"; // Fallback image
+import GradientCircularProgress from "../components/GradientCircularProgress";
 
 const CampaignDetails = ({ web3, account }) => {
   const { address } = useParams();
@@ -264,7 +264,7 @@ const CampaignDetails = ({ web3, account }) => {
           alignItems: "center",
         }}
       >
-        <CircularProgress sx={{ color: "#4caf50" }} />
+        <GradientCircularProgress />
         <Typography variant="h6" sx={{ mt: 2, color: "#000" }}>
           Loading campaign...
         </Typography>
