@@ -16,12 +16,16 @@ A **decentralized crowdfunding platform with voting mechanism** built with **Rea
 - [Running](https://github.com/Hyhen115/crowdfunding-dapp?tab=readme-ov-file#running)
   - [Prerequisites](https://github.com/Hyhen115/crowdfunding-dapp?tab=readme-ov-file#prerequisites)
   - [Installation](https://github.com/Hyhen115/crowdfunding-dapp?tab=readme-ov-file#installation)
+- [Architecture]()
 
 ## App Preview
 #### App Demo
 > Please Connect Your MetaMask Wallet to **Ethereum Sepolia Testnet** Before Trying out the demo
 
---LINK HERE-- [not implemented yet]
+--Website Link-- [not implemented yet]
+
+--Video Link-- [not implemented yet]
+
 #### Connect your MetaMask Wallet & Explore Different Campaigns
 ![dapp-v1](https://github.com/user-attachments/assets/55d096f3-7725-44f5-b729-cf839c52ee7b)
 #### Create & Manage your own Campaigns
@@ -35,6 +39,24 @@ A **decentralized crowdfunding platform with voting mechanism** built with **Rea
 
 #### Refund if Campaigns are Failed
 
+### Guidelines
+- **Connect to Wallet**
+  - Connect your MetaMask wallet in order to use any functions of the DApp
+    > Make sure your wallet's ETH network is same as the DApp contract Demo Here uses [Ethereum Sepolia Testnet](https://sepolia.dev/) [sepolia etherscan](https://sepolia.etherscan.io/)
+- **Explore Campaigns**
+  - Scroll down and Explore Different Campaigns on the Home Page
+- **Create Campaigns**
+  - Create Campaigns by setting up the details and uploading image
+- **Donate to Campaigns**
+  - Support your favourate Campaign using ETH
+- **Get Refunds**
+  - if the Campaign Fails, You can request for a refunds for your donation fees
+- **Propose Deadline Extensions**
+  - Campaign Owner can Propose a **2 Day Deadline Extension Proposal** to your donators to vote for if they allows you to extend your deadline of your project
+  - there will be a voting weight for each donators based on how much they support your campaign
+    > Donating 100 ETH can have weight of 100 votes on Deadline Extension Proposals to encourage donators partipitation in votes and campaign donations
+- **Get Funds**
+  - Campaign Owners can **Only** Withdraw Funds from the crowdfunding Campaign met its target
 ## Libraries
 - react
 - vite
@@ -68,3 +90,13 @@ npm run dev
 ```
 npm run build
 ```
+## Architecture
+### Smart Contracts
+- ```crowdfunding.sol``` Handle donation, Voting, Withdraw Funds, State...
+- ```crowdfundingFactory.sol``` Create and track crowdfunding campaign contracts
+### Frontend
+- Connect to ETH Sepolia testnet via MetaMask providers
+- Upload Images to Cloud Storage
+- Provide UI for Campaign Details, Manage Campaigns, Voting, Donations and more
+### Backend
+- Cloud storage for storing Image user uploads
