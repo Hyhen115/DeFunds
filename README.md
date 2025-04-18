@@ -8,7 +8,7 @@ A **decentralized crowdfunding platform with voting mechanism** built with **Rea
 - [App Preview](https://github.com/Hyhen115/crowdfunding-dapp?tab=readme-ov-file#app-preview)
   - [App Demo](https://github.com/Hyhen115/crowdfunding-dapp#app-demo)
   - [Features](https://github.com/Hyhen115/crowdfunding-dapp?tab=readme-ov-file#connect-your-metamask-wallet--explore-different-campaigns)
-- [Guidelines]()
+- [Guidelines](https://github.com/Hyhen115/crowdfunding-dapp#guidelines)
 - [Libraries](https://github.com/Hyhen115/crowdfunding-dapp?tab=readme-ov-file#libraries)
 - [Running](https://github.com/Hyhen115/crowdfunding-dapp?tab=readme-ov-file#running)
   - [Prerequisites](https://github.com/Hyhen115/crowdfunding-dapp?tab=readme-ov-file#prerequisites)
