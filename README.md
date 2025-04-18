@@ -1,6 +1,6 @@
 # De Funds
 ## Description
-A **decentralized crowdfunding platform with voting mechanism** built with **React**, **Vite**, **web3.js**, **TailwinfCSS**, **Material-UI**, **Boostrap** and **Ethereum**, **Solidity**. Users can create and fund campaigns using Ether, with campaign images uploaded via **Cloudinary**. Smart contracts (`Crowdfund` and `CrowdfundFactory`) manage campaign logic, ensuring transparency and security.
+A **decentralized crowdfunding platform with voting mechanism** built with **React**, **Vite**, **web3.js**, **TailwinfCSS**, **Material-UI**, **Boostrap** and **Ethereum**, **Solidity**. Users can create and fund campaigns using ETH. Smart contracts (`Crowdfund` and `CrowdfundFactory`) manage campaign logic, ensuring transparency and security.
 
 ## Table of Content
 - [Description](https://github.com/Hyhen115/crowdfunding-dapp?tab=readme-ov-file#description)
@@ -8,6 +8,7 @@ A **decentralized crowdfunding platform with voting mechanism** built with **Rea
 - [App Preview](https://github.com/Hyhen115/crowdfunding-dapp?tab=readme-ov-file#app-preview)
   - [App Demo](https://github.com/Hyhen115/crowdfunding-dapp#app-demo)
   - [Features](https://github.com/Hyhen115/crowdfunding-dapp?tab=readme-ov-file#connect-your-metamask-wallet--explore-different-campaigns)
+- [Guidelines]()
 - [Libraries](https://github.com/Hyhen115/crowdfunding-dapp?tab=readme-ov-file#libraries)
 - [Running](https://github.com/Hyhen115/crowdfunding-dapp?tab=readme-ov-file#running)
   - [Prerequisites](https://github.com/Hyhen115/crowdfunding-dapp?tab=readme-ov-file#prerequisites)
@@ -36,7 +37,7 @@ A **decentralized crowdfunding platform with voting mechanism** built with **Rea
 ![dapp-v5](https://github.com/user-attachments/assets/e30df0c9-1a3a-4a79-ac38-05b4ddc1becf)
 #### Refund if Campaigns are Failed
 
-### Guidelines
+## Guidelines
 - **Connect to Wallet**
   - Connect your MetaMask wallet in order to use any functions of the DApp
     > Make sure your wallet's ETH network is same as the DApp contract Demo Here uses [Ethereum Sepolia Testnet](https://sepolia.dev/) [sepolia etherscan](https://sepolia.etherscan.io/)
