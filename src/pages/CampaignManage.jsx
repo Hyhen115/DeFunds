@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 import { initializeCrowdfundContract } from "../utils/crowdfundContract";
 import homeBackground from "../assets/homeBackground.png";
-import campaignImage from "../assets/defualt.jpg"; // Fixed typo
+import campaignImage from "../assets/defualt.jpg";
 import GradientCircularProgress from "../components/GradientCircularProgress";
 import StateBubble from "../components/StateBubble";
 
