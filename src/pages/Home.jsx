@@ -42,7 +42,7 @@ const Home = ({ account, web3, factoryContract }) => {
           const imageUrl = await campaignContract.methods.image().call();
           const ownerAddress = await campaignContract.methods.owner().call();
           const deadline = await campaignContract.methods.deadline().call();
-          const raised = await campaignContract.methods.getContractBalance().call();
+          const totalDonations = await campaignContract.methods.totalDonations().call();
           const goal = await campaignContract.methods.target().call();
           return {
             campaignAddress: campaign.campaignAddress,
@@ -50,7 +50,7 @@ const Home = ({ account, web3, factoryContract }) => {
             imageUrl,
             ownerAddress,
             deadline: Number(deadline),
-            raised: parseFloat(web3.utils.fromWei(raised, "ether")),
+            raised: parseFloat(web3.utils.fromWei(totalDonations, "ether")),
             goal: parseFloat(web3.utils.fromWei(goal, "ether")),
           };
         });

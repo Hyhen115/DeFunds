@@ -50,7 +50,7 @@ const CampaignDetails = ({ web3, account }) => {
         const image = await campaignContract.methods.image().call() || defaultImage;
         const target = await campaignContract.methods.target().call();
         const deadline = await campaignContract.methods.deadline().call();
-        const raised = await campaignContract.methods.getContractBalance().call();
+        const totalDonations = await campaignContract.methods.totalDonations().call();
         const state = await campaignContract.methods.getState().call();
         const hasDonated = await campaignContract.methods.hasDonated(account).call();
 
@@ -104,7 +104,7 @@ const CampaignDetails = ({ web3, account }) => {
           image,
           target: parseFloat(web3.utils.fromWei(target, "ether")),
           deadline: Number(deadline),
-          raised: parseFloat(web3.utils.fromWei(raised, "ether")),
+          raised: parseFloat(web3.utils.fromWei(totalDonations, "ether")),
           state: ["Active", "Success", "Fail"][state],
           hasDonated,
         });
@@ -144,12 +144,12 @@ const CampaignDetails = ({ web3, account }) => {
       const campaignContract = initializeCrowdfundContract(web3, address);
       const amountInWei = web3.utils.toWei(donationAmount, "ether");
       await campaignContract.methods.donate().send({ from: account, value: amountInWei });
-      const raised = await campaignContract.methods.getContractBalance().call();
+      const totalDonations = await campaignContract.methods.totalDonations().call();
       const state = await campaignContract.methods.getState().call();
       const amount = parseFloat(web3.utils.fromWei(amountInWei, "ether"));
       setCampaign((prev) => ({
         ...prev,
-        raised: parseFloat(web3.utils.fromWei(raised, "ether")),
+        raised: parseFloat(web3.utils.fromWei(totalDonations, "ether")),
         state: ["Active", "Success", "Fail"][state],
         hasDonated: true,
       }));
@@ -217,10 +217,10 @@ const CampaignDetails = ({ web3, account }) => {
       setIsRefunding(true);
       const campaignContract = initializeCrowdfundContract(web3, address);
       await campaignContract.methods.refund().send({ from: account });
-      const raised = await campaignContract.methods.getContractBalance().call();
+      const totalDonations = await campaignContract.methods.totalDonations().call();
       setCampaign((prev) => ({
         ...prev,
-        raised: parseFloat(web3.utils.fromWei(raised, "ether")),
+        raised: parseFloat(web3.utils.fromWei(totalDonations, "ether")),
       }));
       setDonators((prev) =>
         prev.map((d) =>

@@ -30,7 +30,8 @@ const MyCampaigns = ({ account, web3, factoryContract }) => {
             const name = await campaignContract.methods.campaignName().call();
             const state = await campaignContract.methods.getState().call();
             const deadline = await campaignContract.methods.deadline().call();
-            const raised = await campaignContract.methods.getContractBalance().call();
+            const totalDonations = await campaignContract.methods.totalDonations().call();
+            const balance = await campaignContract.methods.getContractBalance().call();
             const target = await campaignContract.methods.target().call();
             const curProposal = await campaignContract.methods.curProposal().call();
             const voteEndTime = await campaignContract.methods.voteEndTime().call();
@@ -60,7 +61,8 @@ const MyCampaigns = ({ account, web3, factoryContract }) => {
               name,
               status,
               deadline: deadlineDate,
-              raised: parseFloat(web3.utils.fromWei(raised, "ether")),
+              raised: parseFloat(web3.utils.fromWei(totalDonations, "ether")),
+              balance: parseFloat(web3.utils.fromWei(balance, "ether")),
               target: parseFloat(web3.utils.fromWei(target, "ether")),
               proposalActive: curProposal.active && Number(voteEndTime) > Math.floor(Date.now() / 1000),
               proposalVotesFor: parseFloat(web3.utils.fromWei(curProposal.votesFor, "ether")),

@@ -352,6 +352,19 @@ const crowdfundABI = [
 	},
 	{
 		"inputs": [],
+		"name": "totalDonations",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
 		"name": "voteEndTime",
 		"outputs": [
 			{

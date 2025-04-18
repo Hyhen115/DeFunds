@@ -43,7 +43,8 @@ const CampaignManage = ({ account, web3 }) => {
         const name = await campaignContract.methods.campaignName().call();
         const state = await campaignContract.methods.getState().call();
         const deadline = await campaignContract.methods.deadline().call();
-        const raised = await campaignContract.methods.getContractBalance().call();
+        const balance = await campaignContract.methods.getContractBalance().call();
+        const totalDonations = await campaignContract.methods.totalDonations().call();
         const target = await campaignContract.methods.target().call();
         const curProposal = await campaignContract.methods.curProposal().call();
         const voteEndTime = await campaignContract.methods.voteEndTime().call();
@@ -73,7 +74,8 @@ const CampaignManage = ({ account, web3 }) => {
           name,
           status,
           deadline: deadlineDate,
-          raised: parseFloat(web3.utils.fromWei(raised, "ether")),
+          balance: parseFloat(web3.utils.fromWei(balance, "ether")),
+          totalDonations: parseFloat(web3.utils.fromWei(totalDonations, "ether")),
           target: parseFloat(web3.utils.fromWei(target, "ether")),
           proposalActive: curProposal.active && Number(voteEndTime) > Math.floor(Date.now() / 1000),
           proposalVotesFor: parseFloat(web3.utils.fromWei(curProposal.votesFor, "ether")),
@@ -119,7 +121,7 @@ const CampaignManage = ({ account, web3 }) => {
     try {
       await campaignContract.methods.withdraw().send({ from: account });
       setAlert({ open: true, message: "Funds withdrawn successfully.", severity: "success" });
-      setCampaign((prev) => ({ ...prev, raised: 0 }));
+      setCampaign((prev) => ({ ...prev, balance: 0 }));
     } catch (error) {
       console.error("Error withdrawing funds:", error);
       setAlert({ open: true, message: error.message || "Failed to withdraw funds.", severity: "error" });
@@ -280,17 +282,35 @@ const CampaignManage = ({ account, web3 }) => {
                 <strong>Deadline:</strong> {new Date(campaign.deadline).toLocaleDateString()}
               </Typography>
               <Typography variant="body1" sx={{ color: "#000", mb: 2 }}>
-                <strong>Funding:</strong> {campaign.raised} / {campaign.target} ETH
+                <strong>Funding Target:</strong> {campaign.target} ETH
               </Typography>
-              <Box sx={{ width: "100%", mb: 2 }}>
+              <Box sx={{ mb: 2 }}>
+                <Typography variant="body2" sx={{ color: "#000", mb: 1 }}>
+                  <strong>Current Balance:</strong> {campaign.balance} ETH
+                </Typography>
                 <LinearProgress
                   variant="determinate"
-                  value={campaign.target > 0 ? (campaign.raised / campaign.target) * 100 : 0}
+                  value={campaign.target > 0 ? (campaign.balance / campaign.target) * 100 : 0}
                   sx={{
                     height: 8,
                     borderRadius: 4,
                     backgroundColor: "#e0e0e0",
-                    "& .MuiLinearProgress-bar": { backgroundColor: "#4caf50" },
+                    "& .MuiLinearProgress-bar": { backgroundColor: "#2196f3" }, // Blue for balance
+                  }}
+                />
+              </Box>
+              <Box sx={{ mb: 2 }}>
+                <Typography variant="body2" sx={{ color: "#000", mb: 1 }}>
+                  <strong>Total Donations:</strong> {campaign.totalDonations} ETH
+                </Typography>
+                <LinearProgress
+                  variant="determinate"
+                  value={campaign.target > 0 ? (campaign.totalDonations / campaign.target) * 100 : 0}
+                  sx={{
+                    height: 8,
+                    borderRadius: 4,
+                    backgroundColor: "#e0e0e0",
+                    "& .MuiLinearProgress-bar": { backgroundColor: "#4caf50" }, // Green for donations
                   }}
                 />
               </Box>
@@ -313,7 +333,7 @@ const CampaignManage = ({ account, web3 }) => {
                 <Button
                   variant="contained"
                   fullWidth
-                  disabled={isWithdrawing || !account || campaign.status !== "Success" || campaign.owner.toLowerCase() !== account?.toLowerCase()}
+                  disabled={isWithdrawing || !account || campaign.status !== "Success" || campaign.owner.toLowerCase() !== account?.toLowerCase() || campaign.balance <= 0}
                   onClick={handleWithdraw}
                   sx={{
                     backgroundColor: "#4caf50",
@@ -328,6 +348,8 @@ const CampaignManage = ({ account, web3 }) => {
                     ? "Campaign must be in Success state to withdraw."
                     : campaign.owner.toLowerCase() !== account?.toLowerCase()
                     ? "Only the campaign owner can withdraw."
+                    : campaign.balance <= 0
+                    ? "No funds available to withdraw."
                     : "Withdraw funds to the owner’s wallet."}
                 </Typography>
               </Paper>
