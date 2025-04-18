@@ -8,6 +8,7 @@ contract Crowdfund{
     string public image; // image of the campaign
     uint256 public target; // target fund of the campaign
     uint256 public deadline; // deadline of the campaign
+    uint256 public totalDonations; // keep track of the total funds collected
     address[] public donators; // keep track of who donated
     mapping (address => uint) public donationAmounts; // track donate amount
     mapping (address => bool) public hasDonated; // for check if donator has already donated before -> for O(1) time of donate()
@@ -56,7 +57,7 @@ contract Crowdfund{
     function refreshCampaignState() internal {
 
         // success
-        if (address(this).balance >= target) {
+        if (totalDonations >= target) {
             state = CampaignState.Success;
             return;
         }
@@ -82,14 +83,16 @@ contract Crowdfund{
 
         // record the donation amount
         donationAmounts[msg.sender] += msg.value; // add donation amount in the list mapping
+        totalDonations += msg.value;
 
         // update the state of campaign
         refreshCampaignState();
     }
 
+
     // withdraw funds from the campaign (only the owner can withdraw funds and need to target)
     function withdraw() public onlyOwner{
-        refreshCampaignState();
+        refreshCampaignState(); // to refresh state of Campaign
         require(state == CampaignState.Success, "Campaign not met target");
 
         // balance of this contract (campaign collected funds)
@@ -100,7 +103,7 @@ contract Crowdfund{
         payable(owner).transfer(balance);
     }
 
-    // see balance
+    // see balance of the contract (not for tracking the total dontations)
     function getContractBalance() public view returns (uint256) {
         return address(this).balance;
     }
@@ -109,7 +112,7 @@ contract Crowdfund{
     function getState() public view returns (CampaignState) {
         // refresh state (cant use the function (view only) -> it will update state)
         if(state == CampaignState.Active && block.timestamp > deadline){
-            return address(this).balance >= target? CampaignState.Success : CampaignState.Fail;
+            return totalDonations >= target? CampaignState.Success : CampaignState.Fail;
         }
         return state;
     }
@@ -188,8 +191,6 @@ contract Crowdfund{
         // update the proposal
         curProposal.active = false;
 
-        // decide result
-        uint256 totalDonations = address(this).balance;
         // vote > 50% donation -> win
         // vote <= 50% donation -> lose
         // and no 0 division problems
@@ -205,6 +206,7 @@ contract Crowdfund{
         voteEndTime = 0;
     }
 }
+
 contract CrowdfundFactory {
 
     address public owner;
