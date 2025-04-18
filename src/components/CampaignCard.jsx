@@ -56,7 +56,7 @@ const CampaignCard = ({ title, imageUrl, campaignAddress, deadline, raised, goal
               </Typography>
             </Box>
           </Box>
-          <Box sx={{ display: "flex", justifyContent: "state-between", mb: 1 }}>
+          <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
             <Typography variant="body2" color="text.secondary">
               {state === "Active" && remainingDays > 0 ? `Days Left: ${remainingDays}` : state}
             </Typography>
