@@ -18,6 +18,10 @@ A **decentralized crowdfunding platform with voting mechanism** built with **Rea
   - [Installation](https://github.com/Hyhen115/crowdfunding-dapp?tab=readme-ov-file#installation)
 
 ## App Preview
+#### App Demo
+> Please Connect Your MetaMask Wallet to **Ethereum Sepolia Testnet** Before Trying out the demo
+
+--LINK HERE-- [not implemented yet]
 #### Connect your MetaMask Wallet & Explore Different Campaigns
 ![dapp-v1](https://github.com/user-attachments/assets/55d096f3-7725-44f5-b729-cf839c52ee7b)
 #### Create & Manage your own Campaigns
@@ -40,7 +44,6 @@ A **decentralized crowdfunding platform with voting mechanism** built with **Rea
 - ethereum-blockies-base64
   
 > for detail libraries versions and plugins please check package.json
-> 
 ## Running
 ### Prerequisites
 - Node.js (version >= 16)
