@@ -1,17 +1,15 @@
 import React, { useState } from "react";
 import { Card, CardContent, Typography, Box, LinearProgress } from "@mui/material";
 import makeBlockie from "ethereum-blockies-base64";
-import defaultImage from "../assets/defualt.jpg"; // Corrected import
+import defaultImage from "../assets/defualt.jpg";
+import StateBubble from "./StateBubble";
 
-const CampaignCard = ({ title, imageUrl, campaignAddress, deadline, raised, goal }) => {
+const CampaignCard = ({ title, imageUrl, campaignAddress, deadline, raised, goal, state }) => {
   const [imgSrc, setImgSrc] = useState(imageUrl || defaultImage);
   const truncatedAddress = `${campaignAddress.slice(0, 6)}...${campaignAddress.slice(-4)}`;
   const currentTime = Math.floor(Date.now() / 1000);
   const remainingSeconds = deadline - currentTime;
   const remainingDays = remainingSeconds > 0 ? Math.ceil(remainingSeconds / (60 * 60 * 24)) : 0;
-  const hasEnded = remainingSeconds <= 0;
-  const hasFailed = hasEnded && raised < goal;
-  const statusText = remainingDays > 0 ? `Days Left: ${remainingDays}` : hasFailed ? "Failed" : "Ended";
   const percentage = goal > 0 ? Math.min((raised / goal) * 100, 100) : 0;
   const blockie = makeBlockie(campaignAddress);
 
@@ -58,14 +56,15 @@ const CampaignCard = ({ title, imageUrl, campaignAddress, deadline, raised, goal
               </Typography>
             </Box>
           </Box>
-          <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+          <Box sx={{ display: "flex", justifyContent: "state-between", mb: 1 }}>
             <Typography variant="body2" color="text.secondary">
-              {statusText}
+              {state === "Active" && remainingDays > 0 ? `Days Left: ${remainingDays}` : state}
             </Typography>
             <Typography variant="body2" color="text.secondary">
               {percentage.toFixed(2)}% Funded
             </Typography>
           </Box>
+          <StateBubble state={state} sx={{ mt: 1 }} />
         </Box>
       </CardContent>
       <LinearProgress

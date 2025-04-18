@@ -22,22 +22,59 @@ const Home = ({ account, web3, factoryContract }) => {
         const campaignsFromFactory = await factoryContract.methods.getAllCampaigns().call();
         const campaignPromises = campaignsFromFactory.map(async (campaign) => {
           const campaignContract = initializeCrowdfundContract(web3, campaign.campaignAddress);
-          if (!campaignContract) return null;
-          const title = await campaignContract.methods.campaignName().call();
-          const imageUrl = await campaignContract.methods.image().call();
-          const ownerAddress = await campaignContract.methods.owner().call();
-          const deadline = await campaignContract.methods.deadline().call();
-          const totalDonations = await campaignContract.methods.totalDonations().call();
-          const goal = await campaignContract.methods.target().call();
-          return {
-            campaignAddress: campaign.campaignAddress,
-            title,
-            imageUrl,
-            ownerAddress,
-            deadline: Number(deadline),
-            raised: parseFloat(web3.utils.fromWei(totalDonations, "ether")),
-            goal: parseFloat(web3.utils.fromWei(goal, "ether")),
-          };
+          if (!campaignContract) {
+            console.error(`Failed to initialize contract for campaign: ${campaign.campaignAddress}`);
+            return null;
+          }
+          try {
+            const title = await campaignContract.methods.campaignName().call();
+            const imageUrl = await campaignContract.methods.image().call();
+            const ownerAddress = await campaignContract.methods.owner().call();
+            const deadline = await campaignContract.methods.deadline().call();
+            const totalDonations = await campaignContract.methods.totalDonations().call();
+            const goal = await campaignContract.methods.target().call();
+            const stateNum = await campaignContract.methods.getState().call();
+
+            // Log raw data for debugging
+            console.log(`Campaign ${campaign.campaignAddress}:`, {
+              stateNum: stateNum.toString(),
+              deadline: Number(deadline),
+              totalDonations: web3.utils.fromWei(totalDonations, "ether"),
+              goal: web3.utils.fromWei(goal, "ether"),
+              currentTimestamp: Math.floor(Date.now() / 1000),
+            });
+
+            // Map numeric state to string
+            let state;
+            switch (stateNum.toString()) {
+              case "0":
+                state = "Active";
+                break;
+              case "1":
+                state = "Success";
+                break;
+              case "2":
+                state = "Fail";
+                break;
+              default:
+                console.error(`Unexpected state ${stateNum} for campaign ${campaign.campaignAddress}`);
+                return null;
+            }
+
+            return {
+              campaignAddress: campaign.campaignAddress,
+              title,
+              imageUrl,
+              ownerAddress,
+              deadline: Number(deadline),
+              raised: parseFloat(web3.utils.fromWei(totalDonations, "ether")),
+              goal: parseFloat(web3.utils.fromWei(goal, "ether")),
+              state,
+            };
+          } catch (error) {
+            console.error(`Error fetching data for campaign ${campaign.campaignAddress}:`, error);
+            return null;
+          }
         });
         const campaignsData = await Promise.all(campaignPromises);
         setCampaigns(campaignsData.filter((campaign) => campaign !== null));
@@ -97,6 +134,7 @@ const Home = ({ account, web3, factoryContract }) => {
                     deadline={campaign.deadline}
                     raised={campaign.raised}
                     goal={campaign.goal}
+                    state={campaign.state}
                   />
                 </Link>
               </Grid>
