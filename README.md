@@ -27,16 +27,15 @@ A **decentralized crowdfunding platform with voting mechanism** built with **Rea
 --Video Link-- [not implemented yet]
 
 #### Connect your MetaMask Wallet & Explore Different Campaigns
-![dapp-v1](https://github.com/user-attachments/assets/55d096f3-7725-44f5-b729-cf839c52ee7b)
+![dapp-v1](https://github.com/user-attachments/assets/b9091c40-9dda-4861-9bcc-5d74192fc097)
 #### Create & Manage your own Campaigns
-![dapp-v2](https://github.com/user-attachments/assets/84206ea2-b286-4095-9b24-f0c2b7853d68)
+![dapp-v2](https://github.com/user-attachments/assets/517cc4f3-2882-44ab-a133-f6e13529a0b3)
 #### Propose Deadline Extensions
-![dapp-v3](https://github.com/user-attachments/assets/7e7c452f-7d31-4cc7-ac8a-eb5c1e798625)
+![dapp-v3](https://github.com/user-attachments/assets/90baf6b0-dc23-455b-b0f6-54dcf14b783d)
 #### Donate & Vote for your supported Campaigns
-![dapp-v4-1](https://github.com/user-attachments/assets/19e9000c-258b-43e4-8546-ab29d20c6bd4)
-![dapp-v4-2](https://github.com/user-attachments/assets/de40983c-8173-460b-8030-91cccd57f2ab)
+![dapp-v4-1](https://github.com/user-attachments/assets/c4693f6f-b106-40c2-9739-fd60d02852cb)
 #### Get Funds for your Projects
-![dapp-v5](https://github.com/user-attachments/assets/359cbf13-7ee1-4a67-b85a-46ade3264c63)
+![dapp-v5](https://github.com/user-attachments/assets/e30df0c9-1a3a-4a79-ac38-05b4ddc1becf)
 #### Refund if Campaigns are Failed
 
 ### Guidelines
