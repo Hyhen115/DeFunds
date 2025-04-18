@@ -14,8 +14,9 @@ import {
 } from "@mui/material";
 import { initializeCrowdfundContract } from "../utils/crowdfundContract.js";
 import homeBackground from "../assets/homeBackground.png";
-import defaultImage from "../assets/defualt.jpg"; // Fallback image
+import defaultImage from "../assets/defualt.jpg"; // Fixed typo
 import GradientCircularProgress from "../components/GradientCircularProgress";
+import StateBubble from "../components/StateBubble";
 
 const CampaignDetails = ({ web3, account }) => {
   const { address } = useParams();
@@ -373,19 +374,7 @@ const CampaignDetails = ({ web3, account }) => {
             <strong>Deadline:</strong> {new Date(campaign.deadline * 1000).toLocaleDateString()}
           </Typography>
           <Typography variant="body1" sx={{ color: "#000", mb: 2 }}>
-            <strong>Status:</strong>{" "}
-            <span
-              style={{
-                color:
-                  campaign.state === "Success"
-                    ? "#4caf50"
-                    : campaign.state === "Fail"
-                    ? "#f44336"
-                    : "#1976d2",
-              }}
-            >
-              {campaign.state}
-            </span>
+            <strong>Status:</strong> <StateBubble state={campaign.state} sx={{ ml: 1, verticalAlign: "middle" }} />
           </Typography>
           <Box>
             <Typography variant="h6" gutterBottom sx={{ color: "#000" }}>

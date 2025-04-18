@@ -13,6 +13,7 @@ import {
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import makeBlockie from "ethereum-blockies-base64";
+import StateBubble from "./StateBubble";
 
 const CampaignTable = ({ campaigns }) => {
   return (
@@ -116,20 +117,7 @@ const CampaignTable = ({ campaigns }) => {
                     borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
                   }}
                 >
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      color:
-                        campaign.status === "Success"
-                          ? "#4caf50"
-                          : campaign.status === "Fail"
-                          ? "#f44336"
-                          : "#1976d2",
-                      fontWeight: "medium",
-                    }}
-                  >
-                    {campaign.status}
-                  </Typography>
+                  <StateBubble state={campaign.status} />
                 </TableCell>
                 <TableCell
                   sx={{
@@ -206,7 +194,7 @@ const CampaignTable = ({ campaigns }) => {
                             variant="determinate"
                             value={voteProgress}
                             sx={{
-                              height: 8,
+                              height: "8px",
                               borderRadius: 4,
                               backgroundColor: "#ffcccc",
                               "& .MuiLinearProgress-bar": { backgroundColor: "#4caf50" },
