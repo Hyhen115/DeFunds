@@ -96,7 +96,4 @@ npm run build
 - ```crowdfundingFactory.sol``` Create and track crowdfunding campaign contracts
 ### Frontend
 - Connect to ETH Sepolia testnet via MetaMask providers
-- Upload Images to Cloud Storage
 - Provide UI for Campaign Details, Manage Campaigns, Voting, Donations and more
-### Backend
-- Cloud storage for storing Image user uploads
