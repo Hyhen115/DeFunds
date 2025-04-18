@@ -87,9 +87,9 @@ contract Crowdfund{
         refreshCampaignState();
     }
 
-
     // withdraw funds from the campaign (only the owner can withdraw funds and need to target)
     function withdraw() public onlyOwner{
+        refreshCampaignState();
         require(state == CampaignState.Success, "Campaign not met target");
 
         // balance of this contract (campaign collected funds)
