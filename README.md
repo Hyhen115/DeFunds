@@ -97,4 +97,10 @@ npm run build
 - Provide UI for Campaign Details, Manage Campaigns, Voting, Donations and more
 
 ## Security measures
-
+- ```onlyOwner``` for sensitive functions like ```togglePause()``` ```withdraw()``` ```proposeDeadlineExtension(uint256 _days)``` to eliminate **Access Control Vulnerabilities**
+- ```campaignActive``` modifier for valid campaign states to ensure valid ```donate()``` ```voteOnDeadlineExtension()``` ```confirmDeadlineExtension()``` ```proposeDeadlineExtension(uint256 _days)```
+- when ```ExtensionProposal``` is active, functions ```donation()``` is not allowed, prevent new voters from skewing the decision-making process mid-vote, adds integrity to the voting system.
+- ```refreshCampaignState() internal``` used to update state when there are any operation like ```donate()``` ```withdraw()``` ```refund()```, ```getState() public view``` is same as the ```refreshCampaignState() internal``` acts as the "window" through which external entities can view that updated state, making sure they're seeing the most accurate and current information without accidently updating the data.
+- ```togglePause()``` in ```crowdfundingFactory.sol``` can pause the factory from ```createCampaign()``` ensuring no campaigns can be created during maintenance.
+- in all functions thats envolved in transitions of ETH we ensures updateing the internal data first then perform ```payable(owner).transfer(balance)``` or ```payable(msg.sender).transfer(amount)``` to avoid any **Reentrancy Attack**
+- the Dapp uses ```Solidity >= 0.8.0``` to avoid **Integer Overflow and Underflow**
