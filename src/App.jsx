@@ -15,13 +15,21 @@ const App = () => {
 
   useEffect(() => {
     if (web3) {
-      const factoryInstance = initializeFactoryContract(web3);
-      setFactoryContract(factoryInstance);
+      try {
+        const factoryInstance = initializeFactoryContract(web3);
+        setFactoryContract(factoryInstance);
+        console.log("Factory contract initialized:", factoryInstance);
+      } catch (error) {
+        console.error("Error initializing factory contract:", error);
+      }
     }
   }, [web3]);
 
+  // Log props for debugging
+  console.log("App render:", { web3, account, factoryContract });
+
   return (
-    <Router>
+    <Router basename="/DeFunds">
       <Navbar account={account} setAccount={setAccount} setWeb3={setWeb3} />
       <Routes>
         <Route path="/" element={<Home account={account} web3={web3} factoryContract={factoryContract} />} />

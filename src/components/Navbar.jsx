@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { AppBar, Toolbar, Typography, Button, Box, Collapse } from "@mui/material";
 import { connectWallet } from "../utils/wallet";
 import makeBlockie from "ethereum-blockies-base64";
+import logo_img from "../assets/logo.png";
 
 const Navbar = ({ account, setAccount, setWeb3 }) => {
   const [isMounted, setIsMounted] = useState(false);
@@ -58,7 +59,7 @@ const Navbar = ({ account, setAccount, setWeb3 }) => {
       <Toolbar sx={{ minHeight: 64 }}>
         <Link to="/" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
           <img
-            src="src/assets/logo.png"
+            src={logo_img}
             alt="De Funds Und Freedom Logo"
             style={{ height: "50px", width: "auto", marginRight: "8px" }}
           />
