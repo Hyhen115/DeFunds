@@ -73,8 +73,8 @@ A **decentralized crowdfunding platform with voting mechanism** built with **Rea
 ### Installation
 1. Clone the Repo
 ```
-git clone https://github.com/Hyhen115/crowdfunding-dapp.git
-cd crowdfunding-dapp
+git clone https://github.com/Hyhen115/DeFunds.git
+cd DeFunds
 ```
 2. Install Dependencies
 ```
