@@ -3,8 +3,9 @@ import { Card, CardContent, Typography, Box, LinearProgress } from "@mui/materia
 import makeBlockie from "ethereum-blockies-base64";
 import defaultImage from "../assets/defualt.jpg";
 import StateBubble from "./StateBubble";
+import VotingBubble from "./VotingBubble";
 
-const CampaignCard = ({ title, imageUrl, campaignAddress, deadline, raised, goal, state }) => {
+const CampaignCard = ({ title, imageUrl, campaignAddress, deadline, raised, goal, state, isVoting }) => {
   const [imgSrc, setImgSrc] = useState(imageUrl || defaultImage);
   const truncatedAddress = `${campaignAddress.slice(0, 6)}...${campaignAddress.slice(-4)}`;
   const currentTime = Math.floor(Date.now() / 1000);
@@ -64,7 +65,10 @@ const CampaignCard = ({ title, imageUrl, campaignAddress, deadline, raised, goal
               {percentage.toFixed(2)}% Funded
             </Typography>
           </Box>
-          <StateBubble state={state} sx={{ mt: 1 }} />
+          <Box sx={{ display: "flex", gap: 1, mt: 1 }}>
+            <StateBubble state={state} />
+            <VotingBubble isVoting={isVoting} />
+          </Box>
         </Box>
       </CardContent>
       <LinearProgress

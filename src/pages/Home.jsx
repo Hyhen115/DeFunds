@@ -34,6 +34,7 @@ const Home = ({ account, web3, factoryContract }) => {
             const totalDonations = await campaignContract.methods.totalDonations().call();
             const goal = await campaignContract.methods.target().call();
             const stateNum = await campaignContract.methods.getState().call();
+            const proposal = await campaignContract.methods.curProposal().call();
 
             // Log raw data for debugging
             console.log(`Campaign ${campaign.campaignAddress}:`, {
@@ -42,6 +43,7 @@ const Home = ({ account, web3, factoryContract }) => {
               totalDonations: web3.utils.fromWei(totalDonations, "ether"),
               goal: web3.utils.fromWei(goal, "ether"),
               currentTimestamp: Math.floor(Date.now() / 1000),
+              isVoting: proposal.active,
             });
 
             // Map numeric state to string
@@ -70,6 +72,7 @@ const Home = ({ account, web3, factoryContract }) => {
               raised: parseFloat(web3.utils.fromWei(totalDonations, "ether")),
               goal: parseFloat(web3.utils.fromWei(goal, "ether")),
               state,
+              isVoting: proposal.active, // Add isVoting based on curProposal.active
             };
           } catch (error) {
             console.error(`Error fetching data for campaign ${campaign.campaignAddress}:`, error);
@@ -135,6 +138,7 @@ const Home = ({ account, web3, factoryContract }) => {
                     raised={campaign.raised}
                     goal={campaign.goal}
                     state={campaign.state}
+                    isVoting={campaign.isVoting} // Pass isVoting prop
                   />
                 </Link>
               </Grid>
