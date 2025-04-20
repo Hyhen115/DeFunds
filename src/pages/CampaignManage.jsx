@@ -24,6 +24,9 @@ const CampaignManage = ({ account, web3 }) => {
   const [isWithdrawing, setIsWithdrawing] = useState(false);
   const [proposalDays, setProposalDays] = useState("");
   const [isProposing, setIsProposing] = useState(false);
+  const [owner, setOwner] = useState("");
+  const [proposal, setProposal] = useState(null);
+  const [votingEnded, setVotingEnded] = useState(false);
 
   useEffect(() => {
     const fetchCampaign = async () => {
@@ -49,7 +52,7 @@ const CampaignManage = ({ account, web3 }) => {
         const target = await campaignContract.methods.target().call();
         const curProposal = await campaignContract.methods.curProposal().call();
         const voteEndTime = await campaignContract.methods.voteEndTime().call();
-        const owner = await campaignContract.methods.owner().call();
+        const ownerAddr = await campaignContract.methods.owner().call();
         const image = await campaignContract.methods.image().call() || campaignImage;
 
         let status;
@@ -78,17 +81,29 @@ const CampaignManage = ({ account, web3 }) => {
           balance: parseFloat(web3.utils.fromWei(balance, "ether")),
           totalDonations: parseFloat(web3.utils.fromWei(totalDonations, "ether")),
           target: parseFloat(web3.utils.fromWei(target, "ether")),
-          proposalActive: curProposal.active && Number(voteEndTime) > Math.floor(Date.now() / 1000),
-          proposalVotesFor: parseFloat(web3.utils.fromWei(curProposal.votesFor, "ether")),
-          proposalVotesAgainst: parseFloat(web3.utils.fromWei(curProposal.votesAgainst, "ether")),
-          proposedDays: Number(curProposal.proposedDays),
-          owner,
           image,
         });
+
+        setOwner(ownerAddr.toLowerCase());
+
+        if (curProposal.active) {
+          setProposal({
+            proposedDays: Number(curProposal.proposedDays),
+            votesFor: parseFloat(web3.utils.fromWei(curProposal.votesFor, "ether")),
+            votesAgainst: parseFloat(web3.utils.fromWei(curProposal.votesAgainst, "ether")),
+            voteEndTime: Number(voteEndTime),
+          });
+          const currentTime = Math.floor(Date.now() / 1000);
+          setVotingEnded(currentTime > Number(voteEndTime));
+        } else {
+          setProposal(null);
+          setVotingEnded(false);
+        }
+
+        setIsLoading(false);
       } catch (error) {
         console.error("Error fetching campaign data:", error);
         setAlert({ open: true, message: "Failed to fetch campaign data.", severity: "error" });
-      } finally {
         setIsLoading(false);
       }
     };
@@ -107,7 +122,7 @@ const CampaignManage = ({ account, web3 }) => {
       return;
     }
 
-    if (campaign.owner.toLowerCase() !== account.toLowerCase()) {
+    if (owner !== account.toLowerCase()) {
       setAlert({ open: true, message: "Only the campaign owner can withdraw funds.", severity: "error" });
       return;
     }
@@ -138,12 +153,12 @@ const CampaignManage = ({ account, web3 }) => {
       return;
     }
 
-    if (campaign.owner.toLowerCase() !== account.toLowerCase()) {
+    if (owner !== account.toLowerCase()) {
       setAlert({ open: true, message: "Only the campaign owner can propose a deadline extension.", severity: "error" });
       return;
     }
 
-    if (campaign.proposalActive) {
+    if (proposal && proposal.active) {
       setAlert({ open: true, message: "Another proposal is currently active.", severity: "error" });
       return;
     }
@@ -170,13 +185,13 @@ const CampaignManage = ({ account, web3 }) => {
       await campaignContract.methods.proposeDeadlineExtension(days).send({ from: account });
       setAlert({ open: true, message: `Deadline extension of ${days} days proposed successfully.`, severity: "success" });
       setProposalDays("");
-      setCampaign((prev) => ({
-        ...prev,
-        proposalActive: true,
+      setProposal({
         proposedDays: days,
-        proposalVotesFor: 0,
-        proposalVotesAgainst: 0,
-      }));
+        votesFor: 0,
+        votesAgainst: 0,
+        voteEndTime: Math.floor(Date.now() / 1000) + 3 * 24 * 60 * 60,
+      });
+      setVotingEnded(false);
     } catch (error) {
       console.error("Error proposing deadline extension:", error);
       let errorMessage = "Failed to propose deadline extension.";
@@ -189,12 +204,45 @@ const CampaignManage = ({ account, web3 }) => {
     }
   };
 
+  const handleConfirmExtension = async () => {
+    if (!web3 || !account || account.toLowerCase() !== owner) {
+      setAlert({ open: true, message: "Only the campaign owner can confirm the deadline extension.", severity: "error" });
+      return;
+    }
+
+    if (!proposal || !proposal.active) {
+      setAlert({ open: true, message: "No active proposal to confirm.", severity: "error" });
+      return;
+    }
+
+    if (!votingEnded) {
+      setAlert({ open: true, message: "Voting is still ongoing.", severity: "error" });
+      return;
+    }
+
+    const campaignContract = initializeCrowdfundContract(web3, address);
+    if (!campaignContract) {
+      setAlert({ open: true, message: "Failed to initialize campaign contract.", severity: "error" });
+      return;
+    }
+
+    try {
+      await campaignContract.methods.confirmDeadlineExtension().send({ from: account });
+      setAlert({ open: true, message: "Deadline extension confirmed.", severity: "success" });
+      setProposal(null);
+      setVotingEnded(false);
+    } catch (error) {
+      console.error("Error confirming deadline extension:", error);
+      setAlert({ open: true, message: error.message || "Failed to confirm deadline extension.", severity: "error" });
+    }
+  };
+
   const getProposalStatusMessage = () => {
     if (!campaign || !account) return "Please connect your wallet.";
-    if (campaign.owner.toLowerCase() !== account.toLowerCase()) {
+    if (owner !== account.toLowerCase()) {
       return "Only the campaign owner can propose an extension.";
     }
-    if (campaign.proposalActive) {
+    if (proposal && proposal.active) {
       return "Another proposal is active.";
     }
     if (campaign.totalDonations * 2 < campaign.target) {
@@ -266,7 +314,6 @@ const CampaignManage = ({ account, web3 }) => {
               alignItems: { xs: "center", md: "flex-start" },
             }}
           >
-            {/* Campaign Details */}
             <Paper
               sx={{
                 p: 3,
@@ -307,7 +354,7 @@ const CampaignManage = ({ account, web3 }) => {
                     height: 8,
                     borderRadius: 4,
                     backgroundColor: "#e0e0e0",
-                    "& .MuiLinearProgress-bar": { backgroundColor: "#2196f3" }, // Blue for balance
+                    "& .MuiLinearProgress-bar": { backgroundColor: "#2196f3" },
                   }}
                 />
               </Box>
@@ -322,12 +369,11 @@ const CampaignManage = ({ account, web3 }) => {
                     height: 8,
                     borderRadius: 4,
                     backgroundColor: "#e0e0e0",
-                    "& .MuiLinearProgress-bar": { backgroundColor: "#4caf50" }, // Green for donations
+                    "& .MuiLinearProgress-bar": { backgroundColor: "#4caf50" },
                   }}
                 />
               </Box>
             </Paper>
-            {/* Withdraw and Proposal Boxes */}
             <Box
               sx={{
                 display: "flex",
@@ -337,7 +383,6 @@ const CampaignManage = ({ account, web3 }) => {
                 maxWidth: "400px",
               }}
             >
-              {/* Withdraw Box */}
               <Paper sx={{ p: 3, boxShadow: 3 }}>
                 <Typography variant="h6" sx={{ color: "#000", mb: 2 }}>
                   Withdraw Funds
@@ -345,7 +390,7 @@ const CampaignManage = ({ account, web3 }) => {
                 <Button
                   variant="contained"
                   fullWidth
-                  disabled={isWithdrawing || !account || campaign.status !== "Success" || campaign.owner.toLowerCase() !== account?.toLowerCase() || campaign.balance <= 0}
+                  disabled={isWithdrawing || !account || campaign.status !== "Success" || owner !== account?.toLowerCase() || campaign.balance <= 0}
                   onClick={handleWithdraw}
                   sx={{
                     backgroundColor: "#4caf50",
@@ -358,46 +403,47 @@ const CampaignManage = ({ account, web3 }) => {
                 <Typography variant="body2" sx={{ color: "#000", mt: 1 }}>
                   {campaign.status !== "Success"
                     ? "Campaign must be in Success state to withdraw."
-                    : campaign.owner.toLowerCase() !== account?.toLowerCase()
+                    : owner !== account?.toLowerCase()
                     ? "Only the campaign owner can withdraw."
                     : campaign.balance <= 0
                     ? "No funds available to withdraw."
                     : "Withdraw funds to the owner’s wallet."}
                 </Typography>
               </Paper>
-              {/* Vote/Proposal Box */}
               <Paper sx={{ p: 3, boxShadow: 3 }}>
                 <Typography variant="h6" sx={{ color: "#000", mb: 2 }}>
                   Deadline Extension Proposal
                 </Typography>
-                {campaign.proposalActive ? (
-                  <Box sx={{ mb: 2 }}>
-                    <Typography variant="body1" sx={{ color: "#000", mb: 1 }}>
-                      <strong>Proposed Extension:</strong> {campaign.proposedDays} days
-                    </Typography>
-                    <Typography variant="body1" sx={{ color: "#000", mb: 1 }}>
-                      <strong>Votes For:</strong> {campaign.proposalVotesFor} ETH
-                    </Typography>
-                    <Typography variant="body1" sx={{ color: "#000", mb: 1 }}>
-                      <strong>Votes Against:</strong> {campaign.proposalVotesAgainst} ETH
-                    </Typography>
-                    <Box sx={{ width: "100%" }}>
-                      <LinearProgress
-                        variant="determinate"
-                        value={
-                          campaign.proposalVotesFor + campaign.proposalVotesAgainst > 0
-                            ? (campaign.proposalVotesFor / (campaign.proposalVotesFor + campaign.proposalVotesAgainst)) * 100
-                            : 0
-                        }
-                        sx={{
-                          height: 8,
-                          borderRadius: 4,
-                          backgroundColor: "#ffcccc",
-                          "& .MuiLinearProgress-bar": { backgroundColor: "#4caf50" },
-                        }}
-                      />
+                {proposal && proposal.active ? (
+                  <>
+                    <Box sx={{ mb: 2 }}>
+                      <Typography variant="body1" sx={{ color: "#000", mb: 1 }}>
+                        <strong>Proposed Extension:</strong> {proposal.proposedDays} days
+                      </Typography>
+                      <Typography variant="body1" sx={{ color: "#000", mb: 1 }}>
+                        <strong>Votes For:</strong> {proposal.votesFor} ETH
+                      </Typography>
+                      <Typography variant="body1" sx={{ color: "#000", mb: 1 }}>
+                        <strong>Votes Against:</strong> {proposal.votesAgainst} ETH
+                      </Typography>
+                      <Box sx={{ width: "100%" }}>
+                        <LinearProgress
+                          variant="determinate"
+                          value={
+                            proposal.votesFor + proposal.votesAgainst > 0
+                              ? (proposal.votesFor / (proposal.votesFor + proposal.votesAgainst)) * 100
+                              : 0
+                          }
+                          sx={{
+                            height: 8,
+                            borderRadius: 4,
+                            backgroundColor: "#ffcccc",
+                            "& .MuiLinearProgress-bar": { backgroundColor: "#4caf50" },
+                          }}
+                        />
+                      </Box>
                     </Box>
-                  </Box>
+                  </>
                 ) : (
                   <Typography variant="body2" sx={{ color: "#000", mb: 2 }}>
                     No active proposal.
@@ -413,9 +459,9 @@ const CampaignManage = ({ account, web3 }) => {
                     disabled={
                       isProposing ||
                       !account ||
-                      campaign.owner.toLowerCase() !== account?.toLowerCase() ||
-                      campaign.proposalActive ||
-                      (campaign.totalDonations * 2 < campaign.target)
+                      owner !== account?.toLowerCase() ||
+                      (proposal && proposal.active) ||
+                      campaign.totalDonations * 2 < campaign.target
                     }
                     sx={{ mb: 2 }}
                   />
@@ -426,9 +472,9 @@ const CampaignManage = ({ account, web3 }) => {
                     disabled={
                       isProposing ||
                       !account ||
-                      campaign.owner.toLowerCase() !== account?.toLowerCase() ||
-                      campaign.proposalActive ||
-                      (campaign.totalDonations * 2 < campaign.target)
+                      owner !== account?.toLowerCase() ||
+                      (proposal && proposal.active) ||
+                      campaign.totalDonations * 2 < campaign.target
                     }
                     sx={{
                       backgroundColor: "#4caf50",
@@ -442,6 +488,47 @@ const CampaignManage = ({ account, web3 }) => {
                 <Typography variant="body2" sx={{ color: "#000", mt: 1 }}>
                   {getProposalStatusMessage()}
                 </Typography>
+              </Paper>
+              {/* New Confirmation Card */}
+              <Paper sx={{ p: 3, boxShadow: 3 }}>
+                <Typography variant="h6" sx={{ color: "#000", mb: 2 }}>
+                  Confirm Deadline Extension
+                </Typography>
+                {proposal && proposal.active ? (
+                  votingEnded ? (
+                    account.toLowerCase() === owner ? (
+                      <>
+                        <Typography variant="body2" sx={{ color: "#000", mb: 2 }}>
+                          Voting has ended. You can confirm the deadline extension.
+                        </Typography>
+                        <Button
+                          variant="contained"
+                          onClick={handleConfirmExtension}
+                          fullWidth
+                          sx={{
+                            backgroundColor: "#4caf50",
+                            "&:hover": { backgroundColor: "#388e3c" },
+                            textTransform: "none",
+                          }}
+                        >
+                          Confirm Deadline Extension
+                        </Button>
+                      </>
+                    ) : (
+                      <Typography variant="body2" sx={{ color: "#000" }}>
+                        Only the campaign owner can confirm the proposal.
+                      </Typography>
+                    )
+                  ) : (
+                    <Typography variant="body2" sx={{ color: "#000" }}>
+                      Voting is still ongoing. Confirmation will be available after voting ends.
+                    </Typography>
+                  )
+                ) : (
+                  <Typography variant="body2" sx={{ color: "#000" }}>
+                    No active proposal to confirm.
+                  </Typography>
+                )}
               </Paper>
             </Box>
           </Box>
