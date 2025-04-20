@@ -250,7 +250,7 @@ const factoryABI = [
 ];
 
 // Replace with your deployed CrowdfundFactory address
-const factoryAddress = "0x7BE0a5C63885f2869f86e4c5d40D40295F825c38";
+const factoryAddress = "0x14020b387154c81adae075C6D12B81939fEca50e";
 
 export const initializeFactoryContract = (web3) => {
   if (!web3) {

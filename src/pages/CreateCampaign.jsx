@@ -328,20 +328,6 @@ const CreateCampaign = ({ web3, account, factoryContract }) => {
                   borderColor: "#4F90FF",
                   textTransform: "none",
                 }}
-                component={Link}
-                href="/mycampaign"
-                disabled={!account}
-              >
-                View My Campaigns
-              </Button>
-              <Button
-                variant="outlined"
-                sx={{
-                  mt: 2,
-                  color: "#4F90FF",
-                  borderColor: "#4F90FF",
-                  textTransform: "none",
-                }}
                 onClick={handleSubmit}
               >
                 Create Another

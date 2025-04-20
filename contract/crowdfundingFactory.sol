@@ -3,8 +3,9 @@ pragma solidity ^0.8.0;
 
 // imports
 import {Crowdfund} from "./crowdfunding.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
-contract CrowdfundFactory {
+contract CrowdfundFactory is ReentrancyGuard {
 
     address public owner;
     bool public pause;
@@ -28,7 +29,7 @@ contract CrowdfundFactory {
     }
 
     // create campaign
-    function createCampaign(string memory _name, string memory _description, uint256 _target, uint256 _deadline, string memory _image) external whenNotPaused {
+    function createCampaign(string memory _name, string memory _description, uint256 _target, uint256 _deadline, string memory _image) external whenNotPaused nonReentrant {
         // input validation
         require(bytes(_name).length > 0, "name is empty");
         require(_target > 0, "target must > 0");
