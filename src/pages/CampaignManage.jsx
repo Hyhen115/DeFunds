@@ -148,6 +148,11 @@ const CampaignManage = ({ account, web3 }) => {
       return;
     }
 
+    if (campaign.totalDonations * 2 < campaign.target) {
+      setAlert({ open: true, message: "Total donations must be at least 50% of the target.", severity: "error" });
+      return;
+    }
+
     const days = Number(proposalDays);
     if (!days || days <= 0) {
       setAlert({ open: true, message: "Please enter a valid number of days.", severity: "error" });
@@ -174,10 +179,28 @@ const CampaignManage = ({ account, web3 }) => {
       }));
     } catch (error) {
       console.error("Error proposing deadline extension:", error);
-      setAlert({ open: true, message: error.message || "Failed to propose deadline extension.", severity: "error" });
+      let errorMessage = "Failed to propose deadline extension.";
+      if (error.message.includes("Need >= 50% target")) {
+        errorMessage = "Total donations must be at least 50% of the target.";
+      }
+      setAlert({ open: true, message: errorMessage, severity: "error" });
     } finally {
       setIsProposing(false);
     }
+  };
+
+  const getProposalStatusMessage = () => {
+    if (!campaign || !account) return "Please connect your wallet.";
+    if (campaign.owner.toLowerCase() !== account.toLowerCase()) {
+      return "Only the campaign owner can propose an extension.";
+    }
+    if (campaign.proposalActive) {
+      return "Another proposal is active.";
+    }
+    if (campaign.totalDonations * 2 < campaign.target) {
+      return `Insufficient funding: Need at least ${campaign.target / 2} ETH (50% of target).`;
+    }
+    return "Propose a new deadline extension.";
   };
 
   const handleCloseAlert = () => {
@@ -387,14 +410,26 @@ const CampaignManage = ({ account, web3 }) => {
                     value={proposalDays}
                     onChange={(e) => setProposalDays(e.target.value)}
                     fullWidth
-                    disabled={isProposing || !account || campaign.owner.toLowerCase() !== account?.toLowerCase() || campaign.proposalActive}
+                    disabled={
+                      isProposing ||
+                      !account ||
+                      campaign.owner.toLowerCase() !== account?.toLowerCase() ||
+                      campaign.proposalActive ||
+                      (campaign.totalDonations * 2 < campaign.target)
+                    }
                     sx={{ mb: 2 }}
                   />
                   <Button
                     variant="contained"
                     type="submit"
                     fullWidth
-                    disabled={isProposing || !account || campaign.owner.toLowerCase() !== account?.toLowerCase() || campaign.proposalActive}
+                    disabled={
+                      isProposing ||
+                      !account ||
+                      campaign.owner.toLowerCase() !== account?.toLowerCase() ||
+                      campaign.proposalActive ||
+                      (campaign.totalDonations * 2 < campaign.target)
+                    }
                     sx={{
                       backgroundColor: "#4caf50",
                       "&:hover": { backgroundColor: "#388e3c" },
@@ -405,11 +440,7 @@ const CampaignManage = ({ account, web3 }) => {
                   </Button>
                 </form>
                 <Typography variant="body2" sx={{ color: "#000", mt: 1 }}>
-                  {campaign.owner.toLowerCase() !== account?.toLowerCase()
-                    ? "Only the campaign owner can propose an extension."
-                    : campaign.proposalActive
-                    ? "Another proposal is active."
-                    : "Propose a new deadline extension."}
+                  {getProposalStatusMessage()}
                 </Typography>
               </Paper>
             </Box>
