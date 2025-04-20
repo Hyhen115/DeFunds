@@ -1,6 +1,6 @@
 # De Funds
 ## Description
-A **decentralized crowdfunding platform with voting mechanism** built with **React**, **Vite**, **web3.js**, **TailwinfCSS**, **Material-UI**, **Boostrap** and **Ethereum**, **Solidity**. Users can create and fund campaigns using ETH. Smart contracts (`Crowdfund` and `CrowdfundFactory`) manage campaign logic, ensuring transparency and security.
+A **decentralized crowdfunding platform with voting mechanism** built with **React**, **Vite**, **web3.js**, **TailwindCSS**, **Material-UI**, **Boostrap** and **Ethereum**, **Solidity**. Users can create and fund campaigns using ETH. Smart contracts (`Crowdfund` and `CrowdfundFactory`) manage campaign logic, ensuring transparency and security.
 
 ## Table of Content
 - [Description](https://github.com/Hyhen115/crowdfunding-dapp?tab=readme-ov-file#description)
@@ -53,6 +53,7 @@ A **decentralized crowdfunding platform with voting mechanism** built with **Rea
   - Campaign Owner can Propose a **3 Day Deadline Extension Proposal** to your donators to vote for if they allows you to extend your deadline of your project
   - there will be a voting weight for each donators based on how much they support your campaign
     > Donating 100 ETH can have weight of 100 votes on Deadline Extension Proposals to encourage donators partipitation in votes and campaign donations
+  - when the Extension proposal ends, campain owner can confirm the voting result and extend the deadline
 - **Get Funds**
   - Campaign Owners can **Only** Withdraw Funds from the crowdfunding Campaign met its target
 ## Libraries
@@ -98,7 +99,7 @@ npm run build
 - Provide UI for Campaign Details, Manage Campaigns, Voting, Donations and more
 
 ## Security measures
-
+for more detailed description of the security measures of ```crowdfunding.sol``` and ```crowdfundingFactory.sol``` please refer to the report provided
 ### ```crowdfundingFactory.sol```
 
 #### 1. ReentrancyGuard – `nonReentrant` Modifier
@@ -149,3 +150,15 @@ npm run build
 - in ```confirmDeadlineExtension()```, uses ```votesFor * 2 > totalDonations``` instead of division.
   > **Avoids division-by-zero errors and integer truncation**.
 
+## File Descriptions
+- ```src/```
+  > source code of the Dapp
+- ```contract/```
+  > contract of the Dapp
+  > inside ```test/``` will contain test cases contracts and test results
+- ```package.json```
+  > app config and you can view the library used
+- ```vite.config.js```
+  > vite config
+- ```report/```
+  > detailed report
