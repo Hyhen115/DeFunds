@@ -1,385 +1,274 @@
 Using contract tester version 0.6.2
-(1/3)🧬Compiling contract: test_20980517_1744950497.sol
+(1/3)🧬Compiling contract: allcontract_20980517_1745134084.sol
 [✅PASS]Compilation
-(2/3)🤖Generating test case for: test_20980517_1744950497.sol
+(2/3)🤖Generating test case for: allcontract_20980517_1745134084.sol
 [✅PASS]Read contract
 [ℹ️INFO] Contract file already exists in destination, skipping adjust.
 [⚠️WARNING]No </think> tag found in input
 [✅PASS]Test case generation
 [✅PASS]Write test contract file
-(3/3)🧪Running tests in test_20980517_1744950497.t.sol
+(3/3)🧪Running tests in allcontract_20980517_1745134084.t.sol
 (🧪Attempt 1/3)
-[ℹ️INFO] Encountered compilation error, applying automatic fixer
-[⚠️WARNING]No </think> tag found in input
-[✅PASS]Corrected test contract with compilation error
-[✅PASS]Updated test file
-(🧪Attempt 2/3)
 Compiling 1 files with Solc 0.8.28
-Solc 0.8.28 finished in 806.66ms
+Solc 0.8.28 finished in 776.11ms
 Compiler run successful with warnings:
 Warning (2072): Unused local variable.
-   --> test/test_20980517_1744950497.t.sol:221:9:
+   --> test/allcontract_20980517_1745134084.t.sol:109:9:
     |
-221 |         uint256 originalDeadline = deadline; // original deadline from setUp
-    |         ^^^^^^^^^^^^^^^^^^^^^^^^
+109 |         uint256 ownerBalanceBefore = ownerAddr.balance;
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
-Ran 13 tests for test/test_20980517_1744950497.t.sol:CrowdfundTest
-[PASS] test_createCampaign_invalidParams() (gas: 34478)
+Ran 9 tests for test/allcontract_20980517_1745134084.t.sol:ContractTest
+[PASS] test_createCampaign_inFactory() (gas: 5844999)
 Logs:
-  Campaign deployed with deadline: 432001 and target: 10 ether
-  Running test_createCampaign_invalidParams
+  Running test_createCampaign_inFactory
 
 Traces:
-  [34478] CrowdfundTest::test_createCampaign_invalidParams()
-    ├─ [0] console::log("Running test_createCampaign_invalidParams") [staticcall]
+  [5844999] ContractTest::test_createCampaign_inFactory()
+    ├─ [0] console::log("Running test_createCampaign_inFactory") [staticcall]
     │   └─ ← [Stop] 
-    ├─ [0] VM::expectRevert(custom error 0xf28dceb3:  
-name is empty)
+    ├─ [3543993] → new CrowdfundFactory@0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f
+    │   └─ ← [Return] 17479 bytes of code
+    ├─ [0] VM::prank(PointEvaluation: [0x000000000000000000000000000000000000000A])
     │   └─ ← [Return] 
-    ├─ [5223] CrowdfundFactory::createCampaign("", "Invalid campaign test", 5000000000000000000 [5e18], 864001 [8.64e5], "ipfs://invalid")
-    │   └─ ← [Revert] revert: name is empty
-    ├─ [0] VM::expectRevert(custom error 0xf28dceb3:  target must > 0)
-    │   └─ ← [Return] 
-    ├─ [5251] CrowdfundFactory::createCampaign("Valid Name", "Invalid campaign test", 0, 864001 [8.64e5], "ipfs://invalid")
-    │   └─ ← [Revert] revert: target must > 0
-    ├─ [0] VM::expectRevert(custom error 0xf28dceb3:  deadline must be in the future)
-    │   └─ ← [Return] 
-    ├─ [5273] CrowdfundFactory::createCampaign("Valid Name", "Invalid campaign test", 5000000000000000000 [5e18], 0, "ipfs://invalid")
-    │   └─ ← [Revert] revert: deadline must be in the future
-    └─ ← [Stop] 
-
-[PASS] test_createCampaign_success() (gas: 2187495)
-Logs:
-  Campaign deployed with deadline: 432001 and target: 10 ether
-  Running test_createCampaign_success
-
-Traces:
-  [2187495] CrowdfundTest::test_createCampaign_success()
-    ├─ [0] console::log("Running test_createCampaign_success") [staticcall]
-    │   └─ ← [Stop] 
-    ├─ [0] VM::addr(<pk>) [staticcall]
-    │   └─ ← [Return] 0x4CCeBa2d7D2B4fdcE4304d3e09a1fea9fbEb1528
-    ├─ [0] VM::prank(0x4CCeBa2d7D2B4fdcE4304d3e09a1fea9fbEb1528)
-    │   └─ ← [Return] 
-    ├─ [2159479] CrowdfundFactory::createCampaign("Factory Campaign", "Created via factory", 5000000000000000000 [5e18], 864001 [8.64e5], "ipfs://factoryImage")
-    │   ├─ [1892244] → new Crowdfund@0xffD4505B3452Dc22f8473616d50503bA9E1710Ac
-    │   │   └─ ← [Return] 8754 bytes of code
-    │   ├─ emit CampaignCreated(campaignAddress: Crowdfund: [0xffD4505B3452Dc22f8473616d50503bA9E1710Ac], owner: 0x4CCeBa2d7D2B4fdcE4304d3e09a1fea9fbEb1528, name: "Factory Campaign")
+    ├─ [2246584] CrowdfundFactory::createCampaign("Factory Campaign", "Desc", 5000000000000000000 [5e18], 864001 [8.64e5], "Image")
+    │   ├─ [1980698] → new Crowdfund@0x104fBc016F4bb334D775a19E8A6510109AC63E00
+    │   │   └─ ← [Return] 9085 bytes of code
+    │   ├─ emit CampaignCreated(campaignAddress: Crowdfund: [0x104fBc016F4bb334D775a19E8A6510109AC63E00], owner: PointEvaluation: [0x000000000000000000000000000000000000000A], name: "Factory Campaign")
     │   └─ ← [Stop] 
     ├─ [3277] CrowdfundFactory::getAllCampaigns() [staticcall]
-    │   └─ ← [Return] [Campaign({ campaignAddress: 0xffD4505B3452Dc22f8473616d50503bA9E1710Ac, owner: 0x4CCeBa2d7D2B4fdcE4304d3e09a1fea9fbEb1528, name: "Factory Campaign", createTime: 1 })]
-    ├─ [3629] CrowdfundFactory::getUserCampaigns(0x4CCeBa2d7D2B4fdcE4304d3e09a1fea9fbEb1528) [staticcall]
-    │   └─ ← [Return] [Campaign({ campaignAddress: 0xffD4505B3452Dc22f8473616d50503bA9E1710Ac, owner: 0x4CCeBa2d7D2B4fdcE4304d3e09a1fea9fbEb1528, name: "Factory Campaign", createTime: 1 })]
-    ├─ [0] VM::assertGt(1, 0, "User campaigns should have at least one campaign") [staticcall]
+    │   └─ ← [Return] [Campaign({ campaignAddress: 0x104fBc016F4bb334D775a19E8A6510109AC63E00, owner: 0x000000000000000000000000000000000000000A, name: "Factory Campaign", createTime: 1 })]
+    ├─ [0] VM::assertEq(1, 1, "Factory should have one campaign") [staticcall]
     │   └─ ← [Return] 
     └─ ← [Stop] 
 
-[PASS] test_donate_during_voting_revert() (gas: 205292)
+[PASS] test_donate_success() (gas: 2154492)
 Logs:
-  Campaign deployed with deadline: 432001 and target: 10 ether
-  Running test_donate_during_voting_revert
-
-Traces:
-  [205292] CrowdfundTest::test_donate_during_voting_revert()
-    ├─ [0] console::log("Running test_donate_during_voting_revert") [staticcall]
-    │   └─ ← [Stop] 
-    ├─ [0] VM::prank(0x7E5F4552091A69125d5DfCb7b8C2659029395Bdf)
-    │   └─ ← [Return] 
-    ├─ [98159] Crowdfund::donate{value: 1000000000000000000}()
-    │   └─ ← [Stop] 
-    ├─ [74320] Crowdfund::proposeDeadlineExtension(2)
-    │   ├─ emit DeadlineExtensionProposed(_days: 2, voteEndTime: 259201 [2.592e5])
-    │   └─ ← [Stop] 
-    ├─ [0] VM::prank(0x2B5AD5c4795c026514f8317c7a215E218DcCD6cF)
-    │   └─ ← [Return] 
-    ├─ [0] VM::expectRevert(custom error 0xf28dceb3:   voting period now, cannot donate)
-    │   └─ ← [Return] 
-    ├─ [904] Crowdfund::donate{value: 1000000000000000000}()
-    │   └─ ← [Revert] revert: voting period now, cannot donate
-    └─ ← [Stop] 
-
-[PASS] test_donate_success() (gas: 127209)
-Logs:
-  Campaign deployed with deadline: 432001 and target: 10 ether
   Running test_donate_success
 
 Traces:
-  [127209] CrowdfundTest::test_donate_success()
+  [2154492] ContractTest::test_donate_success()
     ├─ [0] console::log("Running test_donate_success") [staticcall]
     │   └─ ← [Stop] 
-    ├─ [0] VM::prank(0x7E5F4552091A69125d5DfCb7b8C2659029395Bdf)
-    │   └─ ← [Return] 
-    ├─ [98159] Crowdfund::donate{value: 2000000000000000000}()
-    │   └─ ← [Stop] 
-    ├─ [913] Crowdfund::donationAmounts(0x7E5F4552091A69125d5DfCb7b8C2659029395Bdf) [staticcall]
-    │   └─ ← [Return] 2000000000000000000 [2e18]
-    ├─ [0] VM::assertEq(2000000000000000000 [2e18], 2000000000000000000 [2e18], "Donation amount not recorded correctly") [staticcall]
-    │   └─ ← [Return] 
-    ├─ [901] Crowdfund::hasDonated(0x7E5F4552091A69125d5DfCb7b8C2659029395Bdf) [staticcall]
-    │   └─ ← [Return] true
-    ├─ [0] VM::assertTrue(true, "Donor was not registered") [staticcall]
-    │   └─ ← [Return] 
-    ├─ [994] Crowdfund::getState() [staticcall]
+    ├─ [1980698] → new Crowdfund@0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f
+    │   └─ ← [Return] 9085 bytes of code
+    ├─ [2513] Crowdfund::totalDonations() [staticcall]
     │   └─ ← [Return] 0
-    ├─ [0] VM::assertEq(0, 0, "Campaign state should be Active") [staticcall]
+    ├─ [0] VM::assertEq(0, 0, "Initial total donations should be zero") [staticcall]
+    │   └─ ← [Return] 
+    ├─ [112567] Crowdfund::donate{value: 1000000000000000000}()
+    │   └─ ← [Stop] 
+    ├─ [891] Crowdfund::donationAmounts(ContractTest: [0x7FA9385bE102ac3EAc297483Dd6233D62b3e1496]) [staticcall]
+    │   └─ ← [Return] 1000000000000000000 [1e18]
+    ├─ [0] VM::assertEq(1000000000000000000 [1e18], 1000000000000000000 [1e18], "Donation amount not recorded correctly") [staticcall]
+    │   └─ ← [Return] 
+    ├─ [513] Crowdfund::totalDonations() [staticcall]
+    │   └─ ← [Return] 1000000000000000000 [1e18]
+    ├─ [0] VM::assertEq(1000000000000000000 [1e18], 1000000000000000000 [1e18], "Total donations should equal donated amount") [staticcall]
+    │   └─ ← [Return] 
+    ├─ [1055] Crowdfund::donators(0) [staticcall]
+    │   └─ ← [Return] ContractTest: [0x7FA9385bE102ac3EAc297483Dd6233D62b3e1496]
+    ├─ [0] VM::assertEq(ContractTest: [0x7FA9385bE102ac3EAc297483Dd6233D62b3e1496], ContractTest: [0x7FA9385bE102ac3EAc297483Dd6233D62b3e1496], "Donor not recorded correctly") [staticcall]
     │   └─ ← [Return] 
     └─ ← [Stop] 
 
-[PASS] test_donate_zero_revert() (gas: 17276)
+[PASS] test_donate_zero_shouldRevert() (gas: 2024948)
 Logs:
-  Campaign deployed with deadline: 432001 and target: 10 ether
-  Running test_donate_zero_revert
+  Running test_donate_zero_shouldRevert
 
 Traces:
-  [17276] CrowdfundTest::test_donate_zero_revert()
-    ├─ [0] console::log("Running test_donate_zero_revert") [staticcall]
+  [2024948] ContractTest::test_donate_zero_shouldRevert()
+    ├─ [0] console::log("Running test_donate_zero_shouldRevert") [staticcall]
     │   └─ ← [Stop] 
-    ├─ [0] VM::prank(0x7E5F4552091A69125d5DfCb7b8C2659029395Bdf)
-    │   └─ ← [Return] 
+    ├─ [1980698] → new Crowdfund@0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f
+    │   └─ ← [Return] 9085 bytes of code
     ├─ [0] VM::expectRevert(custom error 0xf28dceb3:  Must donate some ETH to donate)
     │   └─ ← [Return] 
-    ├─ [2743] Crowdfund::donate()
+    ├─ [743] Crowdfund::donate()
     │   └─ ← [Revert] revert: Must donate some ETH to donate
     └─ ← [Stop] 
 
-[PASS] test_getState_afterDeadline_fail() (gas: 124162)
+[PASS] test_factory_togglePause() (gas: 3593552)
 Logs:
-  Campaign deployed with deadline: 432001 and target: 10 ether
-  Running test_getState_afterDeadline_fail
+  Running test_factory_togglePause
 
 Traces:
-  [124162] CrowdfundTest::test_getState_afterDeadline_fail()
-    ├─ [0] console::log("Running test_getState_afterDeadline_fail") [staticcall]
+  [3593552] ContractTest::test_factory_togglePause()
+    ├─ [0] console::log("Running test_factory_togglePause") [staticcall]
     │   └─ ← [Stop] 
-    ├─ [0] VM::prank(0x7E5F4552091A69125d5DfCb7b8C2659029395Bdf)
-    │   └─ ← [Return] 
-    ├─ [98159] Crowdfund::donate{value: 2000000000000000000}()
-    │   └─ ← [Stop] 
-    ├─ [0] VM::warp(432002 [4.32e5])
-    │   └─ ← [Return] 
-    ├─ [1008] Crowdfund::getState() [staticcall]
-    │   └─ ← [Return] 2
-    ├─ [0] VM::assertEq(2, 2, "Campaign should have failed after deadline") [staticcall]
-    │   └─ ← [Return] 
-    └─ ← [Stop] 
-
-[PASS] test_proposeAndVoteExtension_fail() (gas: 257551)
-Logs:
-  Campaign deployed with deadline: 432001 and target: 10 ether
-  Running test_proposeAndVoteExtension_fail
-
-Traces:
-  [327204] CrowdfundTest::test_proposeAndVoteExtension_fail()
-    ├─ [0] console::log("Running test_proposeAndVoteExtension_fail") [staticcall]
-    │   └─ ← [Stop] 
-    ├─ [0] VM::prank(0x7E5F4552091A69125d5DfCb7b8C2659029395Bdf)
-    │   └─ ← [Return] 
-    ├─ [98159] Crowdfund::donate{value: 3000000000000000000}()
-    │   └─ ← [Stop] 
-    ├─ [0] VM::prank(0x2B5AD5c4795c026514f8317c7a215E218DcCD6cF)
-    │   └─ ← [Return] 
-    ├─ [68259] Crowdfund::donate{value: 3000000000000000000}()
-    │   └─ ← [Stop] 
-    ├─ [74320] Crowdfund::proposeDeadlineExtension(2)
-    │   ├─ emit DeadlineExtensionProposed(_days: 2, voteEndTime: 259201 [2.592e5])
-    │   └─ ← [Stop] 
-    ├─ [0] VM::prank(0x7E5F4552091A69125d5DfCb7b8C2659029395Bdf)
-    │   └─ ← [Return] 
-    ├─ [46238] Crowdfund::voteOnDeadlineExtension(true)
-    │   ├─ emit Voted(voterAddr: 0x7E5F4552091A69125d5DfCb7b8C2659029395Bdf, voteFor: true, voteAmount: 3000000000000000000 [3e18])
-    │   └─ ← [Stop] 
-    ├─ [0] VM::warp(259202 [2.592e5])
-    │   └─ ← [Return] 
-    ├─ [537] Crowdfund::deadline() [staticcall]
-    │   └─ ← [Return] 432001 [4.32e5]
-    ├─ [2856] Crowdfund::confirmDeadlineExtension()
-    │   ├─ emit DeadlineExtensionFailed()
-    │   └─ ← [Stop] 
-    ├─ [537] Crowdfund::deadline() [staticcall]
-    │   └─ ← [Return] 432001 [4.32e5]
-    ├─ [0] VM::assertEq(432001 [4.32e5], 432001 [4.32e5], "Deadline should not have been extended") [staticcall]
-    │   └─ ← [Return] 
-    └─ ← [Stop] 
-
-[PASS] test_proposeAndVoteExtension_success() (gas: 2334804)
-Logs:
-  Campaign deployed with deadline: 432001 and target: 10 ether
-  Running test_proposeAndVoteExtension_success
-
-Traces:
-  [2494004] CrowdfundTest::test_proposeAndVoteExtension_success()
-    ├─ [0] console::log("Running test_proposeAndVoteExtension_success") [staticcall]
-    │   └─ ← [Stop] 
-    ├─ [0] VM::prank(0x7E5F4552091A69125d5DfCb7b8C2659029395Bdf)
-    │   └─ ← [Return] 
-    ├─ [98159] Crowdfund::donate{value: 3000000000000000000}()
-    │   └─ ← [Stop] 
-    ├─ [0] VM::prank(0x2B5AD5c4795c026514f8317c7a215E218DcCD6cF)
-    │   └─ ← [Return] 
-    ├─ [68259] Crowdfund::donate{value: 3000000000000000000}()
-    │   └─ ← [Stop] 
-    ├─ [74320] Crowdfund::proposeDeadlineExtension(2)
-    │   ├─ emit DeadlineExtensionProposed(_days: 2, voteEndTime: 259201 [2.592e5])
-    │   └─ ← [Stop] 
-    ├─ [0] VM::prank(0x7E5F4552091A69125d5DfCb7b8C2659029395Bdf)
-    │   └─ ← [Return] 
-    ├─ [46238] Crowdfund::voteOnDeadlineExtension(true)
-    │   ├─ emit Voted(voterAddr: 0x7E5F4552091A69125d5DfCb7b8C2659029395Bdf, voteFor: true, voteAmount: 3000000000000000000 [3e18])
-    │   └─ ← [Stop] 
-    ├─ [0] VM::warp(259202 [2.592e5])
-    │   └─ ← [Return] 
-    ├─ [2856] Crowdfund::confirmDeadlineExtension()
-    │   ├─ emit DeadlineExtensionFailed()
-    │   └─ ← [Stop] 
-    ├─ [1892244] → new Crowdfund@0xF62849F9A0B5Bf2913b396098F7c7019b51A820a
-    │   └─ ← [Return] 8754 bytes of code
-    ├─ [0] VM::prank(0x7E5F4552091A69125d5DfCb7b8C2659029395Bdf)
-    │   └─ ← [Return] 
-    ├─ [92159] Crowdfund::donate{value: 4000000000000000000}()
-    │   └─ ← [Stop] 
-    ├─ [72320] Crowdfund::proposeDeadlineExtension(3)
-    │   ├─ emit DeadlineExtensionProposed(_days: 3, voteEndTime: 518402 [5.184e5])
-    │   └─ ← [Stop] 
-    ├─ [0] VM::prank(0x7E5F4552091A69125d5DfCb7b8C2659029395Bdf)
-    │   └─ ← [Return] 
-    ├─ [46238] Crowdfund::voteOnDeadlineExtension(true)
-    │   ├─ emit Voted(voterAddr: 0x7E5F4552091A69125d5DfCb7b8C2659029395Bdf, voteFor: true, voteAmount: 4000000000000000000 [4e18])
-    │   └─ ← [Stop] 
-    ├─ [0] VM::warp(518403 [5.184e5])
-    │   └─ ← [Return] 
-    ├─ [537] Crowdfund::deadline() [staticcall]
-    │   └─ ← [Return] 432001 [4.32e5]
-    ├─ [4141] Crowdfund::confirmDeadlineExtension()
-    │   ├─ emit DeadlineExtensionSuccess(deadline: 691201 [6.912e5])
-    │   └─ ← [Stop] 
-    ├─ [537] Crowdfund::deadline() [staticcall]
-    │   └─ ← [Return] 691201 [6.912e5]
-    ├─ [0] VM::assertEq(691201 [6.912e5], 691201 [6.912e5], "Deadline was not correctly extended") [staticcall]
-    │   └─ ← [Return] 
-    └─ ← [Stop] 
-
-[PASS] test_refund_nonDonor_revert() (gas: 46923)
-Logs:
-  Campaign deployed with deadline: 432001 and target: 10 ether
-  Running test_refund_nonDonor_revert
-
-Traces:
-  [46923] CrowdfundTest::test_refund_nonDonor_revert()
-    ├─ [0] console::log("Running test_refund_nonDonor_revert") [staticcall]
-    │   └─ ← [Stop] 
-    ├─ [0] VM::warp(432002 [4.32e5])
-    │   └─ ← [Return] 
-    ├─ [0] VM::prank(0x6813Eb9362372EEF6200f3b1dbC3f819671cBA69)
-    │   └─ ← [Return] 
-    ├─ [0] VM::expectRevert(custom error 0xf28dceb3:  No fund to refund)
-    │   └─ ← [Return] 
-    ├─ [29591] Crowdfund::refund()
-    │   └─ ← [Revert] revert: No fund to refund
-    └─ ← [Stop] 
-
-[PASS] test_refund_success() (gas: 138304)
-Logs:
-  Campaign deployed with deadline: 432001 and target: 10 ether
-  Running test_refund_success
-
-Traces:
-  [158204] CrowdfundTest::test_refund_success()
-    ├─ [0] console::log("Running test_refund_success") [staticcall]
-    │   └─ ← [Stop] 
-    ├─ [0] VM::prank(0x7E5F4552091A69125d5DfCb7b8C2659029395Bdf)
-    │   └─ ← [Return] 
-    ├─ [98159] Crowdfund::donate{value: 2000000000000000000}()
-    │   └─ ← [Stop] 
-    ├─ [0] VM::warp(432002 [4.32e5])
-    │   └─ ← [Return] 
-    ├─ [1008] Crowdfund::getState() [staticcall]
-    │   └─ ← [Return] 2
-    ├─ [0] VM::assertEq(2, 2, "Campaign state should be Fail") [staticcall]
-    │   └─ ← [Return] 
-    ├─ [0] VM::prank(0x7E5F4552091A69125d5DfCb7b8C2659029395Bdf)
-    │   └─ ← [Return] 
-    ├─ [28630] Crowdfund::refund()
-    │   ├─ [0] 0x7E5F4552091A69125d5DfCb7b8C2659029395Bdf::fallback{value: 2000000000000000000}()
-    │   │   └─ ← [Stop] 
-    │   └─ ← [Stop] 
-    ├─ [913] Crowdfund::donationAmounts(0x7E5F4552091A69125d5DfCb7b8C2659029395Bdf) [staticcall]
-    │   └─ ← [Return] 0
-    ├─ [0] VM::assertEq(0, 0, "Donation record should be zero after refund") [staticcall]
-    │   └─ ← [Return] 
-    ├─ [0] VM::assertGe(100000000000000000000 [1e20], 100000000000000000000 [1e20]) [staticcall]
-    │   └─ ← [Return] 
-    └─ ← [Stop] 
-
-[PASS] test_togglePause() (gas: 22321)
-Logs:
-  Campaign deployed with deadline: 432001 and target: 10 ether
-  Running test_togglePause
-
-Traces:
-  [22321] CrowdfundTest::test_togglePause()
-    ├─ [0] console::log("Running test_togglePause") [staticcall]
-    │   └─ ← [Stop] 
-    ├─ [5659] CrowdfundFactory::togglePause()
+    ├─ [3543993] → new CrowdfundFactory@0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f
+    │   └─ ← [Return] 17479 bytes of code
+    ├─ [862] CrowdfundFactory::togglePause()
     │   └─ ← [Stop] 
     ├─ [0] VM::expectRevert(custom error 0xf28dceb3:  it is paused)
     │   └─ ← [Return] 
-    ├─ [3204] CrowdfundFactory::createCampaign("Paused Campaign", "Should fail", 5000000000000000000 [5e18], 864001 [8.64e5], "ipfs://image")
+    ├─ [3205] CrowdfundFactory::createCampaign("Paused Campaign", "Desc", 5000000000000000000 [5e18], 864001 [8.64e5], "Image")
     │   └─ ← [Revert] revert: it is paused
     └─ ← [Stop] 
 
-[PASS] test_withdraw_onlyOwner_revert() (gas: 141258)
+[PASS] test_proposeDeadlineExtension_success() (gas: 2228918)
 Logs:
-  Campaign deployed with deadline: 432001 and target: 10 ether
-  Running test_withdraw_onlyOwner_revert
+  Running test_proposeDeadlineExtension_success
 
 Traces:
-  [141258] CrowdfundTest::test_withdraw_onlyOwner_revert()
-    ├─ [0] console::log("Running test_withdraw_onlyOwner_revert") [staticcall]
+  [2228918] ContractTest::test_proposeDeadlineExtension_success()
+    ├─ [0] console::log("Running test_proposeDeadlineExtension_success") [staticcall]
     │   └─ ← [Stop] 
-    ├─ [0] VM::prank(0x7E5F4552091A69125d5DfCb7b8C2659029395Bdf)
-    │   └─ ← [Return] 
-    ├─ [116230] Crowdfund::donate{value: 10000000000000000000}()
+    ├─ [1980698] → new Crowdfund@0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f
+    │   └─ ← [Return] 9085 bytes of code
+    ├─ [114567] Crowdfund::donate{value: 5000000000000000000}()
     │   └─ ← [Stop] 
-    ├─ [0] VM::prank(0x7E5F4552091A69125d5DfCb7b8C2659029395Bdf)
+    ├─ [72795] Crowdfund::proposeDeadlineExtension(2)
+    │   ├─ emit DeadlineExtensionProposed(_days: 2, voteEndTime: 259201 [2.592e5])
+    │   └─ ← [Stop] 
+    ├─ [0] VM::expectRevert(custom error 0xf28dceb3:   voting period now, cannot donate)
     │   └─ ← [Return] 
-    ├─ [0] VM::expectRevert(custom error 0xf28dceb3:  
-only owner)
+    ├─ [904] Crowdfund::donate{value: 100000000000000000}()
+    │   └─ ← [Revert] revert: voting period now, cannot donate
+    ├─ [492] Crowdfund::voteEndTime() [staticcall]
+    │   └─ ← [Return] 259201 [2.592e5]
+    ├─ [0] VM::assertEq(259201 [2.592e5], 259201 [2.592e5], "Vote end time incorrect") [staticcall]
     │   └─ ← [Return] 
-    ├─ [2618] Crowdfund::withdraw()
-    │   └─ ← [Revert] revert: only owner
     └─ ← [Stop] 
 
-[PASS] test_withdraw_success() (gas: 235281)
+[PASS] test_refund_success() (gas: 2165320)
 Logs:
-  Campaign deployed with deadline: 432001 and target: 10 ether
+  Running test_refund_success
+
+Traces:
+  [2185220] ContractTest::test_refund_success()
+    ├─ [0] console::log("Running test_refund_success") [staticcall]
+    │   └─ ← [Stop] 
+    ├─ [1980698] → new Crowdfund@0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f
+    │   └─ ← [Return] 9085 bytes of code
+    ├─ [0] VM::prank(0x000000000000000000000000000000000000000b)
+    │   └─ ← [Return] 
+    ├─ [114567] Crowdfund::donate{value: 1000000000000000000}()
+    │   └─ ← [Stop] 
+    ├─ [0] VM::warp(172801 [1.728e5])
+    │   └─ ← [Return] 
+    ├─ [891] Crowdfund::donationAmounts(0x000000000000000000000000000000000000000b) [staticcall]
+    │   └─ ← [Return] 1000000000000000000 [1e18]
+    ├─ [0] VM::assertEq(1000000000000000000 [1e18], 1000000000000000000 [1e18], "Donation not recorded correctly") [staticcall]
+    │   └─ ← [Return] 
+    ├─ [0] VM::prank(0x000000000000000000000000000000000000000b)
+    │   └─ ← [Return] 
+    ├─ [29124] Crowdfund::refund()
+    │   ├─ [0] 0x000000000000000000000000000000000000000b::fallback{value: 1000000000000000000}()
+    │   │   └─ ← [Stop] 
+    │   └─ ← [Stop] 
+    ├─ [891] Crowdfund::donationAmounts(0x000000000000000000000000000000000000000b) [staticcall]
+    │   └─ ← [Return] 0
+    ├─ [0] VM::assertEq(0, 0, "Donation amount should be reset after refund") [staticcall]
+    │   └─ ← [Return] 
+    ├─ [0] VM::assertApproxEqAbs(100000000000000000000 [1e20], 100000000000000000000 [1e20], 1) [staticcall]
+    │   └─ ← [Return] 
+    └─ ← [Stop] 
+
+[PASS] test_voteAndConfirmDeadlineExtension_success() (gas: 2197919)
+Logs:
+  Running test_voteAndConfirmDeadlineExtension_success
+
+Traces:
+  [2277519] ContractTest::test_voteAndConfirmDeadlineExtension_success()
+    ├─ [0] console::log("Running test_voteAndConfirmDeadlineExtension_success") [staticcall]
+    │   └─ ← [Stop] 
+    ├─ [1980698] → new Crowdfund@0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f
+    │   └─ ← [Return] 9085 bytes of code
+    ├─ [0] VM::prank(0x000000000000000000000000000000000000000b)
+    │   └─ ← [Return] 
+    ├─ [114567] Crowdfund::donate{value: 5000000000000000000}()
+    │   └─ ← [Stop] 
+    ├─ [0] VM::prank(ContractTest: [0x7FA9385bE102ac3EAc297483Dd6233D62b3e1496])
+    │   └─ ← [Return] 
+    ├─ [72795] Crowdfund::proposeDeadlineExtension(2)
+    │   ├─ emit DeadlineExtensionProposed(_days: 2, voteEndTime: 259201 [2.592e5])
+    │   └─ ← [Stop] 
+    ├─ [0] VM::prank(0x000000000000000000000000000000000000000b)
+    │   └─ ← [Return] 
+    ├─ [46238] Crowdfund::voteOnDeadlineExtension(true)
+    │   ├─ emit Voted(voterAddr: 0x000000000000000000000000000000000000000b, voteFor: true, voteAmount: 5000000000000000000 [5e18])
+    │   └─ ← [Stop] 
+    ├─ [0] VM::warp(345601 [3.456e5])
+    │   └─ ← [Return] 
+    ├─ [537] Crowdfund::deadline() [staticcall]
+    │   └─ ← [Return] 864001 [8.64e5]
+    ├─ [4397] Crowdfund::confirmDeadlineExtension()
+    │   ├─ emit DeadlineExtensionSuccess(deadline: 1036801 [1.036e6])
+    │   └─ ← [Stop] 
+    ├─ [537] Crowdfund::deadline() [staticcall]
+    │   └─ ← [Return] 1036801 [1.036e6]
+    ├─ [0] VM::assertEq(1036801 [1.036e6], 1036801 [1.036e6], "Deadline was not extended correctly") [staticcall]
+    │   └─ ← [Return] 
+    └─ ← [Stop] 
+
+[PASS] test_voteReverts_whenAlreadyVoted() (gas: 2272399)
+Logs:
+  Running test_voteReverts_whenAlreadyVoted
+
+Traces:
+  [2272399] ContractTest::test_voteReverts_whenAlreadyVoted()
+    ├─ [0] console::log("Running test_voteReverts_whenAlreadyVoted") [staticcall]
+    │   └─ ← [Stop] 
+    ├─ [1980698] → new Crowdfund@0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f
+    │   └─ ← [Return] 9085 bytes of code
+    ├─ [0] VM::prank(0x000000000000000000000000000000000000000b)
+    │   └─ ← [Return] 
+    ├─ [114567] Crowdfund::donate{value: 5000000000000000000}()
+    │   └─ ← [Stop] 
+    ├─ [0] VM::prank(ContractTest: [0x7FA9385bE102ac3EAc297483Dd6233D62b3e1496])
+    │   └─ ← [Return] 
+    ├─ [72795] Crowdfund::proposeDeadlineExtension(1)
+    │   ├─ emit DeadlineExtensionProposed(_days: 1, voteEndTime: 259201 [2.592e5])
+    │   └─ ← [Stop] 
+    ├─ [0] VM::prank(0x000000000000000000000000000000000000000b)
+    │   └─ ← [Return] 
+    ├─ [46238] Crowdfund::voteOnDeadlineExtension(true)
+    │   ├─ emit Voted(voterAddr: 0x000000000000000000000000000000000000000b, voteFor: true, voteAmount: 5000000000000000000 [5e18])
+    │   └─ ← [Stop] 
+    ├─ [0] VM::prank(0x000000000000000000000000000000000000000b)
+    │   └─ ← [Return] 
+    ├─ [0] VM::expectRevert(custom error 0xf28dceb3:  
+already voted)
+    │   └─ ← [Return] 
+    ├─ [1735] Crowdfund::voteOnDeadlineExtension(true)
+    │   └─ ← [Revert] revert: already voted
+    └─ ← [Stop] 
+
+[PASS] test_withdraw_success() (gas: 2183076)
+Logs:
   Running test_withdraw_success
 
 Traces:
-  [235281] CrowdfundTest::test_withdraw_success()
+  [2183076] ContractTest::test_withdraw_success()
     ├─ [0] console::log("Running test_withdraw_success") [staticcall]
     │   └─ ← [Stop] 
-    ├─ [0] VM::prank(0x7E5F4552091A69125d5DfCb7b8C2659029395Bdf)
-    │   └─ ← [Return] 
-    ├─ [98159] Crowdfund::donate{value: 6000000000000000000}()
+    ├─ [1980698] → new Crowdfund@0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f
+    │   └─ ← [Return] 9085 bytes of code
+    ├─ [134638] Crowdfund::donate{value: 5000000000000000000}()
     │   └─ ← [Stop] 
-    ├─ [0] VM::prank(0x2B5AD5c4795c026514f8317c7a215E218DcCD6cF)
+    ├─ [884] Crowdfund::getState() [staticcall]
+    │   └─ ← [Return] 1
+    ├─ [0] VM::assertEq(1, 1, "Campaign should be successful") [staticcall]
     │   └─ ← [Return] 
-    ├─ [88330] Crowdfund::donate{value: 5000000000000000000}()
-    │   └─ ← [Stop] 
-    ├─ [0] VM::assertGe(11000000000000000000 [1.1e19], 10000000000000000000 [1e19]) [staticcall]
+    ├─ [467] Crowdfund::getContractBalance() [staticcall]
+    │   └─ ← [Return] 5000000000000000000 [5e18]
+    ├─ [0] VM::assertEq(5000000000000000000 [5e18], 5000000000000000000 [5e18], "Campaign contract balance incorrect") [staticcall]
     │   └─ ← [Return] 
-    ├─ [10104] Crowdfund::withdraw()
-    │   ├─ [41] CrowdfundTest::receive{value: 11000000000000000000}()
+    ├─ [0] VM::prank(ContractTest: [0x7FA9385bE102ac3EAc297483Dd6233D62b3e1496])
+    │   └─ ← [Return] 
+    ├─ [8600] Crowdfund::withdraw()
+    │   ├─ [41] ContractTest::receive{value: 5000000000000000000}()
     │   │   └─ ← [Stop] 
     │   └─ ← [Stop] 
-    ├─ [0] VM::assertEq(0, 0, "Campaign balance should be zero after withdrawal") [staticcall]
-    │   └─ ← [Return] 
-    ├─ [0] VM::assertGe(79228162525264337593543950335 [7.922e28], 79228162525264337593543950335 [7.922e28]) [staticcall]
+    ├─ [467] Crowdfund::getContractBalance() [staticcall]
+    │   └─ ← [Return] 0
+    ├─ [0] VM::assertEq(0, 0, "Campaign contract should have zero balance after withdrawal") [staticcall]
     │   └─ ← [Return] 
     └─ ← [Stop] 
 
-Suite result: ok. 13 passed; 0 failed; 0 skipped; finished in 2.93ms (1.63ms CPU time)
+Suite result: ok. 9 passed; 0 failed; 0 skipped; finished in 2.43ms (1.80ms CPU time)
 
-Ran 1 test suite in 1.63s (2.93ms CPU time): 13 tests passed, 0 failed, 0 skipped (13 total tests)
+Ran 1 test suite in 1.28s (2.43ms CPU time): 9 tests passed, 0 failed, 0 skipped (9 total tests)
 

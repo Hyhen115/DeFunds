@@ -193,7 +193,7 @@ contract Crowdfund is ReentrancyGuard{
     }
 
     // confirm voting result
-    function confirmDeadlineExtension() public campaignActive {
+    function confirmDeadlineExtension() public campaignActive onlyOwner{
         require(curProposal.active, "no proposal now"); // check have any proposal to confirm
         require(block.timestamp > voteEndTime, "voting still ongoing"); // check is still voting
 
