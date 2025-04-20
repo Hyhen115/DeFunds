@@ -50,7 +50,7 @@ A **decentralized crowdfunding platform with voting mechanism** built with **Rea
 - **Get Refunds**
   - if the Campaign Fails, You can request for a refunds for your donation fees
 - **Propose Deadline Extensions**
-  - Campaign Owner can Propose a **2 Day Deadline Extension Proposal** to your donators to vote for if they allows you to extend your deadline of your project
+  - Campaign Owner can Propose a **3 Day Deadline Extension Proposal** to your donators to vote for if they allows you to extend your deadline of your project
   - there will be a voting weight for each donators based on how much they support your campaign
     > Donating 100 ETH can have weight of 100 votes on Deadline Extension Proposals to encourage donators partipitation in votes and campaign donations
 - **Get Funds**
@@ -89,6 +89,7 @@ npm run dev
 npm run build
 ```
 ## Architecture
+
 ### Smart Contracts
 - ```crowdfunding.sol``` Handle donation, Voting, Withdraw Funds, State...
 - ```crowdfundingFactory.sol``` Create and track crowdfunding campaign contracts
@@ -97,10 +98,54 @@ npm run build
 - Provide UI for Campaign Details, Manage Campaigns, Voting, Donations and more
 
 ## Security measures
-- ```onlyOwner``` for sensitive functions like ```togglePause()``` ```withdraw()``` ```proposeDeadlineExtension(uint256 _days)``` to eliminate **Access Control Vulnerabilities**
-- ```campaignActive``` modifier for valid campaign states to ensure valid ```donate()``` ```voteOnDeadlineExtension()``` ```confirmDeadlineExtension()``` ```proposeDeadlineExtension(uint256 _days)```
-- when ```ExtensionProposal``` is active, functions ```donation()``` is not allowed, prevent new voters from skewing the decision-making process mid-vote, adds integrity to the voting system.
-- ```refreshCampaignState() internal``` used to update state when there are any operation like ```donate()``` ```withdraw()``` ```refund()```, ```getState() public view``` is same as the ```refreshCampaignState() internal``` acts as the "window" through which external entities can view that updated state, making sure they're seeing the most accurate and current information without accidently updating the data.
-- ```togglePause()``` in ```crowdfundingFactory.sol``` can pause the factory from ```createCampaign()``` ensuring no campaigns can be created during maintenance.
-- in all functions thats envolved in transitions of ETH we ensures updateing the internal data first then perform ```payable(owner).transfer(balance)``` or ```payable(msg.sender).transfer(amount)``` to avoid any **Reentrancy Attack**
-- the Dapp uses ```Solidity >= 0.8.0``` to avoid **Integer Overflow and Underflow**
+
+### ```crowdfundingFactory.sol```
+
+#### 1. ReentrancyGuard – `nonReentrant` Modifier
+- apply to ```createCampaign()```.
+  > **Prevents reentrancy attacks**, ensure external calls (e.g., contract creation) cannot re-enters.
+
+#### 2. ```onlyOwner``` Modifier
+- restrict access to `togglePause()`.
+  > Ensure only owner can pause or unpause campaign creation, for maintenance or emergency purposes.
+
+#### 3. ```whenNotPaused``` Modifier
+- apply to `createCampaign()`.
+  > Block campaign creation when the contract is paused, allow owner to stop operations during maintenance.
+
+#### 4. Input Validations in ```createCampaign()```
+- enforce conditions on inputs.
+  > Prevent invalid campaign setups.
+
+### ```crowdfunding.sol```
+
+#### 1. ReentrancyGuard – `nonReentrant` Modifier
+- apply to ```withdraw()``` and ```refund()```.
+  > **Protects against reentrancy attacks** by preventing re-entry during external calls (e.g., ```transfer()```).
+
+#### 2. ```onlyOwner``` Modifier
+- restructive access to ```withdraw()```, ```proposeDeadlineExtension()```, and ```confirmDeadlineExtension()```.
+  > Ensures that only the campaign owner can execute these sensitive operations.
+
+#### 3. ```campaignActive``` Modifier
+- apply to ```donate()```, ```proposeDeadlineExtension()```, ```voteOnDeadlineExtension()```, and ```confirmDeadlineExtension()```.
+  > **Prevent invalid operations** (e.g., donate to a failed campaign).
+
+#### 4. Input Validations for ```proposeDeadlineExtension()``` ```voteOnDeadlineExtension()``` ```confirmDeadlineExtension()```
+
+#### 5. Safe Fund Transfers
+- in ```withdraw()``` and ```refund()```, state updates occur before `transfer()`.
+  > decrease risks for failed transfers or reentrancy attacks.
+
+#### 6. Weighted Voting
+- voting power of ```voteOnDeadlineExtension()``` <=> ```donationAmounts[msg.sender]```.
+  > **Increases the cost of Sybil attacks**.
+
+#### 7. Single Vote Checking
+- use ```curProposal.hasVoted[msg.sender]``` to track votes.
+  > **Prevents double voting**.
+
+#### 8. Avoiding Division-by-Zero in Voting
+- in ```confirmDeadlineExtension()```, uses ```votesFor * 2 > totalDonations``` instead of division.
+  > **Avoids division-by-zero errors and integer truncation**.
+
