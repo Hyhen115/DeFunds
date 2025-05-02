@@ -1,5 +1,5 @@
 # De Funds
-[Try De Funds Here](https://hyhen115.github.io/DeFunds/)
+[Try De Funds Here (Ethereum Sepolia Testnet)](https://hyhen115.github.io/DeFunds/)
 ## Description
 A **decentralized crowdfunding platform with voting mechanism** built with **React**, **Vite**, **web3.js**, **TailwindCSS**, **Material-UI**, **Boostrap** and **Ethereum**, **Solidity**. Users can create and fund campaigns using ETH. Smart contracts (`Crowdfund` and `CrowdfundFactory`) manage campaign logic, ensuring transparency and security.
 
