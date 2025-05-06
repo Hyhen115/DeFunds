@@ -23,8 +23,6 @@ A **decentralized crowdfunding platform with voting mechanism** built with **Rea
 
 [De Funds Website LINK HERE](https://hyhen115.github.io/DeFunds/)
 
---Video Link-- [not implemented yet]
-
 #### Connect your MetaMask Wallet & Explore Different Campaigns
 ![dapp-v1](https://github.com/user-attachments/assets/b9091c40-9dda-4861-9bcc-5d74192fc097)
 #### Create & Manage your own Campaigns
